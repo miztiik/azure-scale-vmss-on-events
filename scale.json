@@ -1,0 +1,68 @@
+{
+    "location": "westeurope",
+    "tags": {},
+    "properties": {
+        "name": "testscaleautoscale",
+        "enabled": true,
+        "targetResourceUri": "/subscriptions/1ac6fdb8-61a9-4e86-a871-1baff37cd9e3/resourceGroups/Miztiik_Enterprises_scale_vmss_on_events_001/providers/Microsoft.Compute/virtualMachineScaleSets/testscale",
+        "profiles": [
+            {
+                "name": "Profile1",
+                "capacity": {
+                    "minimum": "1",
+                    "maximum": "3",
+                    "default": "1"
+                },
+                "rules": [
+                    {
+                        "scaleAction": {
+                            "direction": "Increase",
+                            "type": "ChangeCount",
+                            "value": "1",
+                            "cooldown": "PT1M"
+                        },
+                        "metricTrigger": {
+                            "metricName": "ApproximateMessageCount",
+                            "metricNamespace": "",
+                            "metricResourceUri": "/subscriptions/1ac6fdb8-61a9-4e86-a871-1baff37cd9e3/resourceGroups/Miztiik_Enterprises_scale_vmss_on_events_001/providers/Microsoft.Storage/storageAccounts/warehousejfyzdk001/services/queue/queues/store-events-q-001",
+                            "operator": "GreaterThan",
+                            "statistic": "Average",
+                            "threshold": 1000,
+                            "timeAggregation": "Average",
+                            "timeGrain": "PT1M",
+                            "timeWindow": "PT5M",
+                            "Dimensions": [],
+                            "dividePerInstance": false
+                        }
+                    },
+                    {
+                        "scaleAction": {
+                            "direction": "Decrease",
+                            "type": "ChangeCount",
+                            "value": "1",
+                            "cooldown": "PT1M"
+                        },
+                        "metricTrigger": {
+                            "metricName": "ApproximateMessageCount",
+                            "metricNamespace": "",
+                            "metricResourceUri": "/subscriptions/1ac6fdb8-61a9-4e86-a871-1baff37cd9e3/resourceGroups/Miztiik_Enterprises_scale_vmss_on_events_001/providers/Microsoft.Storage/storageAccounts/warehousejfyzdk001/services/queue/queues/store-events-q-001",
+                            "operator": "LessThan",
+                            "statistic": "Average",
+                            "threshold": 500,
+                            "timeAggregation": "Average",
+                            "timeGrain": "PT1M",
+                            "timeWindow": "PT5M",
+                            "Dimensions": [],
+                            "dividePerInstance": true
+                        }
+                    }
+                ]
+            }
+        ],
+        "notifications": [],
+        "targetResourceLocation": "westeurope"
+    },
+    "id": "/subscriptions/1ac6fdb8-61a9-4e86-a871-1baff37cd9e3/resourceGroups/Miztiik_Enterprises_scale_vmss_on_events_001/providers/microsoft.insights/autoscalesettings/testscaleautoscale",
+    "name": "testscaleautoscale",
+    "type": "Microsoft.Insights/autoscaleSettings"
+}

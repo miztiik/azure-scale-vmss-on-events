@@ -1,0 +1,125 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "deploymentParams": {
+      "value": {
+        "location": "westeurope",
+        "global_uniqueness": "003",
+        "enterprise_name": "Miztiik_Enterprises",
+        "enterprise_name_suffix": "scale_vmss_on_events",
+        "sub_deploymnet_prefix": "Miztiik_Verse"
+      }
+    },
+    "rgParams": {
+      "value": {}
+    },
+    "vnetParams": {
+      "value": {
+        "vnetNamePrefix": "dataGenSwarm",
+        "natGateway": false,
+        "subnets": [
+          {
+            "name": "GatewaySubnet",
+            "properties": {
+              "addressPrefix": "10.10.0.0/24",
+              "networkSecurityGroup": false,
+              "routeTable": false,
+              "natGateway": false,
+              "privateEndpointNetworkPolicies": "Enabled",
+              "privateLinkServiceNetworkPolicies": "Enabled",
+              "serviceEndpoints": []
+            },
+            "routeTable": {
+              "properties": {}
+            },
+            "securityRules": []
+          },
+          {
+            "name": "AzureFirewallSubnet",
+            "properties": {
+              "addressPrefix": "10.10.1.0/24",
+              "networkSecurityGroup": false,
+              "routeTable": false,
+              "natGateway": false,
+              "privateEndpointNetworkPolicies": "Enabled",
+              "privateLinkServiceNetworkPolicies": "Enabled",
+              "serviceEndpoints": []
+            },
+            "routeTable": {
+              "properties": {}
+            },
+            "securityRules": []
+          }
+        ]
+      }
+    },
+    "appConfigParams":{
+      "value":{
+        "appConfigNamePrefix": "store-events",
+        "appConfigSku": "standard"
+      }
+    },
+    "vmParams": {
+      "value": {
+        "vmSize": "Standard_DS2_v2",
+        "vmNamePrefix": "m-web-srv",
+        "vmSubnetName": "webSubnet01",
+        "adminUsername": "miztiik",
+        "adminPassword": {
+          "secureString": "YOUR-ADMIN-PASSWRD-GOES-HERE-1NSTEAD-OF-THIS-T3xT!"
+        },
+        "isUbuntu": true,
+        "authType": "password",
+        "publicIPAllocationMethod": "Dynamic",
+        "publicIpSku": "Basic",
+        "isWindows": false,
+        "isLinux": true
+      }
+    },
+    "storageAccountParams": {
+      "value": {
+        "storageAccountNamePrefix": "warehouse",
+        "storageAccountType": "Standard_LRS",
+        "allowBlobPublicAccess": false,
+        "kind": "StorageV2",
+        "minimumTlsVersion": "TLS1_2",
+        "sku": "Standard_LRS",
+        "blobNamePrefix": "store-events"
+      }
+    },
+    "storageQueueParams":{
+      "value":{
+        "queueNamePrefix": "store-events"
+      }
+    },
+    "logAnalyticsWorkspaceParams": {
+      "value": {
+        "workspaceName": "lumberYard",
+        "storeEventsCustomTableName": "storeEvents",
+        "retentionInDays": 32,
+        "dailyQuotaGb": 2,
+        "commitTier": false,
+        "automationEventsCustomTableName": "miztiikAutomationEvents"
+      }
+    },
+    "dceParams": {
+      "value": {
+        "endpointNamePrefix": "webStore"
+      }
+    },
+    "brandTags": {
+      "value": {
+        "owner": "Mystique",
+        "automation_by": "Mystique_Automation",
+        "github_profile": "https://github.com/miztiik",
+        "about_me": "https://github.com/miztiik/about-me",
+        "udemy_profile": "https://www.udemy.com/user/n-kumar",
+        "skill_profile": "https://www.skillshare.com/r/profile/Kumar/407603333",
+        "buy_me_a_coffee": "https://ko-fi.com/miztiik",
+        "project": "azure-scale-vmss-on-events",
+        "github_repo_url": "https://github.com/miztiik/azure-scale-vmss-on-events"
+      }
+    }
+  }
+}
