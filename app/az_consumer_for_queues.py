@@ -92,6 +92,7 @@ def _read_n_del_from_q(q_name, q_svc_client, _evnt_type, blob_svc_client):
         messages = q_client.receive_messages(max_messages=5)
         for msg in messages:
             _write_to_blob(_evnt_type, msg.content, blob_svc_client)
+            time.sleep(GlobalArgs.WAIT_SECS_BETWEEN_MSGS) # Slow down the consumer to build up the queue
             logger.info(f"Processed {msg.content} successfully")
             q_client.delete_message(msg.id, msg.pop_receipt)
     except Exception as e:
@@ -172,7 +173,8 @@ def lambda_handler(event, context):
                 inventory_evnts += 1
 
 
-            logger.info(json.dumps(evnt_body, indent=4))
+            # logger.info(json.dumps(evnt_body, indent=4))
+
             # Write to blob
             # write_to_blob(_evnt_type, evnt_body, blob_svc_client)
 

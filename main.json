@@ -5,14 +5,11 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.2.56959",
-      "templateHash": "18351520881808032015"
+      "templateHash": "5523852614339355987"
     }
   },
   "parameters": {
     "deploymentParams": {
-      "type": "object"
-    },
-    "rgParams": {
       "type": "object"
     },
     "appConfigParams": {
@@ -1312,7 +1309,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.2.56959",
-              "templateHash": "11549350471573897832"
+              "templateHash": "5776188223022217540"
             }
           },
           "parameters": {
@@ -1508,10 +1505,10 @@
                 "publisher": "Microsoft.Azure.Extensions",
                 "type": "CustomScript",
                 "autoUpgradeMinorVersion": true,
-                "forceUpdateTag": "2",
+                "forceUpdateTag": "4",
                 "settings": {
                   "fileUris": [
-                    "hhttps://raw.githubusercontent.com/miztiik/azure-scale-vmss-on-events/main/app/az_consumer_for_queues.py"
+                    "https://raw.githubusercontent.com/miztiik/azure-scale-vmss-on-events/main/app/az_consumer_for_queues.py"
                   ],
                   "commandToExecute": "[format('#!/bin/bash; export APP_CONFIG_NAME={0}; python3 az_consumer_for_queues.py', parameters('appConfigName'))]"
                 },
