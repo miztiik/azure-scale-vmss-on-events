@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.2.56959",
-      "templateHash": "10604734390400101196"
+      "templateHash": "18351520881808032015"
     }
   },
   "parameters": {
@@ -1312,7 +1312,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.2.56959",
-              "templateHash": "9390715150109106733"
+              "templateHash": "11549350471573897832"
             }
           },
           "parameters": {
@@ -1511,7 +1511,7 @@
                 "forceUpdateTag": "2",
                 "settings": {
                   "fileUris": [
-                    "https://raw.githubusercontent.com/miztiik/azure-vm-to-storage-queue/main/app/az_consumer_for_queues.py"
+                    "hhttps://raw.githubusercontent.com/miztiik/azure-scale-vmss-on-events/main/app/az_consumer_for_queues.py"
                   ],
                   "commandToExecute": "[format('#!/bin/bash; export APP_CONFIG_NAME={0}; python3 az_consumer_for_queues.py', parameters('appConfigName'))]"
                 },

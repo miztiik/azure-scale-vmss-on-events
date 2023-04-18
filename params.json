@@ -11,9 +11,6 @@
         "sub_deploymnet_prefix": "Miztiik_Verse"
       }
     },
-    "rgParams": {
-      "value": {}
-    },
     "vnetParams": {
       "value": {
         "vnetNamePrefix": "dataGenSwarm",

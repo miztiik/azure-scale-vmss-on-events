@@ -189,9 +189,9 @@ resource r_setupCustomScript 'Microsoft.Compute/virtualMachineScaleSets/extensio
     publisher: 'Microsoft.Azure.Extensions'
     type: 'CustomScript'
     autoUpgradeMinorVersion: true
-    forceUpdateTag: '2'
+    forceUpdateTag: '4'
     settings: {
-      fileUris: ['hhttps://raw.githubusercontent.com/miztiik/azure-scale-vmss-on-events/main/app/az_consumer_for_queues.py']
+      fileUris: ['https://raw.githubusercontent.com/miztiik/azure-scale-vmss-on-events/main/app/az_consumer_for_queues.py']
       commandToExecute: '#!/bin/bash; export APP_CONFIG_NAME=${appConfigName}; python3 az_consumer_for_queues.py'
     }
     suppressFailures: false

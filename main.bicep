@@ -2,7 +2,6 @@ targetScope = 'subscription'
 
 // Parameters
 param deploymentParams object
-param rgParams object
 param appConfigParams object
 param storageAccountParams object
 param storageQueueParams object
