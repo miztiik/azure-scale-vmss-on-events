@@ -191,7 +191,7 @@ resource r_setupCustomScript 'Microsoft.Compute/virtualMachineScaleSets/extensio
     autoUpgradeMinorVersion: true
     forceUpdateTag: '2'
     settings: {
-      fileUris: ['https://raw.githubusercontent.com/miztiik/azure-vm-to-storage-queue/main/app/az_consumer_for_queues.py']
+      fileUris: ['hhttps://raw.githubusercontent.com/miztiik/azure-scale-vmss-on-events/main/app/az_consumer_for_queues.py']
       commandToExecute: '#!/bin/bash; export APP_CONFIG_NAME=${appConfigName}; python3 az_consumer_for_queues.py'
     }
     suppressFailures: false
