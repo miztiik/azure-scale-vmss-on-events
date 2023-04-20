@@ -85,10 +85,7 @@ While building this solution, I have found anamolies that created challenges in 
       QueueMessageCount: 0 TimePeriod: 2023-04-19T00:00:00Z/2023-04-21T00:00:00Z Granularity: 1:00:00
       ```
 
-      StackOverflow<sup>[11]</sup> has highlighted the issue. 
-  
-
-   - **Azure SDK to Query Queue Metrics from Azure Monitor** - Querying the Queue Message count directly using SDK seems to deliver much better results. Using the Python SDK<sup>[10]</sup>, I have tested the queue length update frequency.
+   - **Azure SDK to Query Queue Metrics from Queue Properties** - Querying the Queue Message count directly using SDK seems to deliver much better results. Using the Python SDK<sup>[10]</sup>, I have tested the queue length update frequency.
 
       ```python
       import os
@@ -137,9 +134,7 @@ While building this solution, I have found anamolies that created challenges in 
       
 ## 📒 Conclusion
 
-    From this, I have come to the conclusion that the `QueueMessageCount` metric is not consistenly updated  by the platform nor the frequency is reliable. As of now, The best way to monitor the queue length is to use the SDK to query the queue directly. We can use Functions to query the queue length and scale the VMSS accordingly.
-
-  ```bash
+  From this, I have come to the conclusion that the `QueueMessageCount` metric is not consistenly updated  by the platform nor the frequency is reliable. StackOverflow<sup>[11]</sup> has highlighted the issue.  As of now, The best way to monitor the queue length is to use the SDK to query the queue directly. We can use Functions to query the queue length and scale the VMSS accordingly.
 
 ## 🧹 CleanUp
 
