@@ -126,9 +126,11 @@ module r_vm 'modules/vm/create_vm.bicep' = {
 
     vmParams: vmParams
     vnetName: r_vnet.outputs.vnetName
+
     linDataCollectionEndpointId: r_dataCollectionEndpoint.outputs.linDataCollectionEndpointId
     storeEventsDcrId: r_dataCollectionRule.outputs.storeEventsDcrId
     automationEventsDcrId: r_dataCollectionRule.outputs.automationEventsDcrId
+
     tags: tags
   }
   dependsOn: [
@@ -146,6 +148,14 @@ module r_vmss 'modules/vm/create_vmss.bicep' = {
     vnetName: r_vnet.outputs.vnetName
     userManagedIdentityId: r_vm.outputs.userManagedIdentityId
     appConfigName: r_appConfig.outputs.appConfigName
+
+    queueId: r_storageQueue.outputs.queueId
+
+    linDataCollectionEndpointId: r_dataCollectionEndpoint.outputs.linDataCollectionEndpointId
+    storeEventsDcrId: r_dataCollectionRule.outputs.storeEventsDcrId
+    automationEventsDcrId: r_dataCollectionRule.outputs.automationEventsDcrId
+
+
     tags: tags
   }
   dependsOn: [
