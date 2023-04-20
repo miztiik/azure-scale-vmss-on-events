@@ -8,7 +8,7 @@ They heard that Azure offers capabilities to build event-driven architectures us
 
 We can configure autoscaling to Azure VMSS<sup>[1]</sup> to increase or decrease the VMsin response to events. In this particular case, we can to scale based on Storage Message Queue Length. As of now[Q2-2023], the granularity supported by Azure is at Storage Account level and not at individual Storage Queue Level<sup>[2]</sup>. So, this means we will have to restrict the storage account to only one queue to make this work. Lets assume this is acceptable in a parallel universe and continue.
 
-![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_001.png)
+![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_vm_to_storage_queue_architecture_0001.png)
 
 While building this solution, I have found anamolies that created challenges in implementing this solution. I have documented them in the [Anamolies](#-anamolies) section. 
 

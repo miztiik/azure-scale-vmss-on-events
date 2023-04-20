@@ -5,7 +5,7 @@
     "deploymentParams": {
       "value": {
         "location": "westeurope",
-        "global_uniqueness": "011",
+        "global_uniqueness": "012",
         "enterprise_name": "Miztiik_Enterprises",
         "enterprise_name_suffix": "scale_vmss_on_events",
         "sub_deploymnet_prefix": "Miztiik_Verse"
