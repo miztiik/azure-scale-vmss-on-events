@@ -1,199 +1,86 @@
-# Publish & Subscribe with Azure Storage Queues
+# Auto Scaling Azure VM(ScaleSets) in response to events
 
-The developer at Mystique Unicorn are interested in building their application using event-driven architectural pattern to process streaming data. For those who are unfamiliar, An event-driven architecture uses events to trigger and communicate between decoupled services and is common in modern applications built with microservices. An event is a change in state, or an update, like an item being placed in a shopping cart on an e-commerce website.
+The developer at Mystique Unicorn are building their application using event-driven architectural pattern to process streaming data. In this application, they will have their physical stores, send a stream sales and inventory related events to a central location, where multiple downstream systems will consume these events. They are looking to scale their event consumers running in Azure VM Scale Sets when their Azure Storage queue length increases. 
 
-In this application, they will have their physical stores, send a stream sales and inventory related events to a central location, where multiple downstream systems will consume these events. For example, An event for a new order will be consumed by the warehouse system and the sales events will be used by the marketing department to generate revenue and forecast reports. This pattern of separating the produce, router and consumer to independent components allows them to scale the applications without constraints.
-
-They heard that Azure offers capabilities to build event-driven architectures using kubernetes, Can you show them how they can get started? 
+They heard that Azure offers capabilities to build event-driven architectures using kubernetes, Can you show them how they can get started?
 
 ## 🎯 Solutions
 
-We can have our producers leverage Azure Storage Queue<sup>[1]</sup> to persist the store event messages. The consumers can process them at their own pace. The producers can also set the `time-to-live` on the messages for time sensitive messages. But remember that Azure Storage Queue does not gurantee FIFO(aka First In, First out) ordering of messages. We will use the Azure Python SDK<sup>[2],[6],[7],[8]</sup> for producing and consuming our messages. We will control access to your queue using RBAC for queue<sup>[3]
+We can configure autoscaling to Azure VMSS<sup>[1]</sup> to increase or decrease the VMsin response to events. In this particular case, we can to scale based on Storage Message Queue Length. As of now[Q2-2023], the granularity supported by Azure is at Storage Account level and not at individual Storage Queue Level<sup>[2]</sup>. So, this means we will have to restrict the storage account to only one queue to make this work. Lets assume this is acceptable in a parallel universe and continue.
 
+![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_001.png)
 
-![Miztiik Automaton: Publish & Subscribe with Azure Storage Queues](images/miztiik_automation_azure_vm_to_storage_queue_architecture_0001.png)
+While building this solution, I have used other anamolies that created challenges in implementing this solution. I have documented them in the [Anamolies](#-anamolies) section. 
 
-1. ## 🧰 Prerequisites
+## 📝 Anamolies
+   - **Azure Monitor Storage Account Metrics** - The granularity of Storage Queue Metrics is at storage account level and not at individual resource level <sup>[3],[4],[5]</sup> as a metric. 
+   - **Azure Monitor Metric Update Frequency** - `QueueMessageCount` is platform metric<sup>[5]</sup>. The update frequency is supposedly `1` minute<sup>[6]</sup>. 
+   
+        _Excerpt from the docs_<sup>[5]</sup>
+    
+        >This article is a complete list of all platform (that is, automatically collected) metrics currently available with the consolidated metric pipeline in Azure Monitor.
 
-   This demo, instructions, scripts and bicep template is designed to be run in `westeurope`. With few or no modifications you can try it out in other regions as well(_Not covered here_).
+        _Excerpt from the docs_<sup>[6]</sup>
+    
+        >Platform metrics are collected from Azure resources at **one-minute** frequency unless specified otherwise in the metric's definition.
 
-   - 🛠 Azure CLI Installed & Configured - [Get help here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
-   - 🛠 Bicep Installed & Configured - [Get help here](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install)
-   - 🛠 VS Code & Bicep Extenstions - [Get help here](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#vs-code-and-bicep-extension)
+      The best practices for monitoring Azure Queue Storage<sup>[7]</sup> informs that this is metric is refreshed daily.
 
-1. ## ⚙️ Setting up the environment
+        _Excerpt from the docs_<sup>[7]</sup>
+    
+        >You can monitor the message count for all queues in a storage account by using the QueueMessageCount metric. This metric is **refreshed daily**.
+   
+   
+      StackOverflow<sup>[8]</sup> has highlighted the issue. My own testing shows that the metric is not updated even after every few hours.
+      ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_002.png)
+      ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_003.png)
 
-   - Get the application code
+      Using the Ptyhon SDK, I have tested the queue lenght update frequency.
 
-     ```bash
-     git clone https://github.com/miztiik/azure-vm-to-storage-queue
-     cd azure-vm-to-storage-queue
-     ```
+      ```py
+      import os
+      import time
+      from azure.identity import DefaultAzureCredential
+      from azure.storage.queue import QueueServiceClient
 
-1. ## 🚀 Prepare the environment
+      Q_NAME="store-events-q-011"
+      SA_NAME = os.getenv("SA_NAME", "warehouseghv6kv011")
+      Q_SVC_ACCOUNT_URL=f"https://{SA_NAME}.queue.core.windows.net"
 
-   Let check you have Azure Cli working with 
+      credential = DefaultAzureCredential(logging_enable=False)
+      q_svc_client = QueueServiceClient(Q_SVC_ACCOUNT_URL, credential=credential)
 
-    ```bash
-      # You should have azure cli preinstalled
-      az account show
-    ```
+      q_client = q_svc_client.get_queue_client(Q_NAME)
 
-    You should see an output like this,
-
-   ```json
-    {
-      "environmentName": "AzureCloud",
-      "homeTenantId": "16b30820b6d3",
-      "id": "1ac6fdbff37cd9e3",
-      "isDefault": true,
-      "managedByTenants": [],
-      "name": "YOUR-SUBS-NAME",
-      "state": "Enabled",
-      "tenantId": "16b30820b6d3",
-      "user": {
-        "name": "miztiik@",
-        "type": "user"
-      }
-    }
-   ```
-
-1. ## 🚀 Deploying the application
-
-   Let us walk through each of the stacks,
-
-   - **Stack: Main Bicep**
-     The params required for the modules are in `params.json`. Do modify them to suit your need.(_Especially the `adminPassword.secureString` for the VM. You are strongly encouraged to Just-In-Time access<sup>[5]</sup> or use SSH key instead of password based authentication_). The helper deployment script `deploy.sh` will deploy the `main.bicep` file. This will create the following resoureces
-     - Resource Group(RG)
-     - VNet, Subnet & Virtual Machine
-     - Virtual Machine(Ubuntu)
-        - Bootstrapped with custom libs using `userData` script.
-     - Storage Account - `warehouseXXXX`
-        - Blob Container - `store-events-blob-xxx`
-        - Storage Queue - `store-events-q-xxx`
-      - App Config
-        - The application configs to be used by producers & consumers
-          - Storage account, Blob Name, Queue Name
-     - User Managed Identity
-        - Scoped with contributor privileges with conditional access restricting to a Blob, Queue & App Config
-        - Identity attached to the VM
-      - Log Anayltics Workspace
-        - Data Collection Endpoint
-        - Data Collection Rule
-          - Attached to VM
-
-      ```bash
-      sh deploy.sh
+      for num in range(1, 11):
+          properties = q_client.get_queue_properties()
+          count = properties.approximate_message_count
+          print("Current Message count: " + str(count))
+          time.sleep(10)
       ```
-
-     After successfully deploying the stack, Check the `Resource Groups/Deployments` section for the resources.
-
-
-1. ## 🔬 Testing the solution
-
-   - **Connect to the VM**
-
-      The Ubuntu vm _should_ be bootstrapped using `userData` to install python3, git and also Azure SDK for Idenity, Blob & Queue.
-      - Connect to the using using Just In Time Access<sup>[5]</sup>.
-      - The bootstrap code should have clone this repo to `/var/azure-vm-to-storage-queue`, If not clone the repo.
-      - The `az_producer_forqueue.py` script expects `APP_CONFIG_NAME` Store as an environment variable
-
-    - **Producer**
-
+      _Output: As we can observe the # of messages keep increasing every `10` seconds_
       ```bash
-      # ssh miztiik@publicIP
-      # cd /var/
-      # git clone https://github.com/miztiik/azure-vm-to-storage-queue
-      # cd azure-vm-to-storage-queue
-
-      # If pre-reqs have not been installed, run the bootstrap script manually
-      # bash /var/azure-vm-to-storage-queue/modules/vm/bootstrap_scripts/deploy_app.sh
-      
-      export APP_CONFIG_NAME="store-events-config-011"
-      python3 /var/azure-vm-to-storage-queue/app/az_producer_for_queues.py &
+      Tuple timeout setting is deprecated
+      Current Message count: 2973
+      Tuple timeout setting is deprecated
+      Current Message count: 2977
+      Tuple timeout setting is deprecated
+      Current Message count: 2981
+      Tuple timeout setting is deprecated
+      Current Message count: 2985
+      Tuple timeout setting is deprecated
+      Current Message count: 2989
+      Tuple timeout setting is deprecated
+      Current Message count: 2993
+      Tuple timeout setting is deprecated
+      Current Message count: 2997
+      Tuple timeout setting is deprecated
+      Current Message count: 3001
+      Tuple timeout setting is deprecated
+      Current Message count: 3005
+      Tuple timeout setting is deprecated
+      Current Message count: 3009
       ```
-
-        If everything goes all right, you should see messages like below. You can also check the logs at `/var/log/miztiik-store-events-2023-04-17.json`
-
-        ```bash
-        INFO:root:{
-            "request_id": "80745806-7378-439e-9707-12d485236d54",
-            "store_id": 6,
-            "store_fqdn": "m-web-srv-011.internal.cloudapp.net",
-            "store_ip": "10.0.0.4",
-            "cust_id": 103,
-            "category": "Furniture",
-            "sku": 95894,
-            "price": 43.43,
-            "qty": 32,
-            "discount": 4.1,
-            "gift_wrap": false,
-            "variant": "black",
-            "priority_shipping": true,
-            "ts": "2023-04-17T12:56:35.868661",
-            "contact_me": "github.com/miztiik",
-            "is_return": true
-        }
-        INFO:root:Message added to store-events-q-011 successfully
-        ```
-
-      The script should create and publish the events to storage queue.
-
-      ![Miztiik Automaton: Publish & Subscribe with Azure Storage Queues](images/miztiik_automation_azure_vm_to_storage_queue_architecture_002.png)
-
-      - **Consumer**
-        The consumer will read a maximum of `5` messages from the queue and write the events to blob storage and then delete the messages from the queue. The `az_consumer_for_queues.py` script expects `APP_CONFIG_NAME` Store as an environment variable
-
-        ```bash
-        export APP_CONFIG_NAME="store-events-config-003"
-        python3 /var/azure-vm-to-storage-queue/app/az_consumer_for_queues.py &
-        ```
-
-        If everything goes all right, you should see messages like below. You can also check the logs at `/var/log/miztiik-store-events-2023-04-17.json`
-
-        ```bash
-        INFO:root:Message received from store-events-q-011
-        INFO:root:{
-            "request_id": "80745806-7378-439e-9707-12d485236d54",
-            "store_id": 6,
-            "store_fqdn": "m-web-srv-011.internal.cloudapp.net",
-            "store_ip": "
-        ```
-      ![Miztiik Automaton: Publish & Subscribe with Azure Storage Queues](images/miztiik_automation_azure_vm_to_storage_queue_architecture_003.png)
-      ![Miztiik Automaton: Publish & Subscribe with Azure Storage Queues](images/miztiik_automation_azure_vm_to_storage_queue_architecture_004.png)
-
-  1. **Troubleshooting Azure Monitor Agent**
-
-      - Check if the VM can write to blob using cli. List Blobs
-
-        ```sh
-          RG_NAME="MIZTIIK_ENTERPRISES_AZURE_VM_TO_BLOB_STORAGE_011"
-          SA_NAME="warehousei5chd4011"
-          CONTAINER_NAME="store-events-011"
-
-          az storage blob list \
-              --container-name ${CONTAINER_NAME1} \
-              --account-name ${SA_NAME} \
-              --auth-mode login
-
-          az storage blob directory list \
-              --container-name ${CONTAINER_NAME} \
-              -d default \
-              --account-name ${SA_NAME} \
-              --auth-mode login
-        ```
-
-        Upload file to blob,
-
-        ```sh
-        echo "hello world on $(date +'%Y-%m-%d')" > miztiik.log
-        az storage blob upload \
-          --account-name ${SA_NAME} \
-          --container-name ${CONTAINER_NAME} \
-          --name miztiik.log \
-          --file miztiik.log \
-          --auth-mode login
-        ```
 
       
 1. ## 📒 Conclusion
@@ -218,7 +105,7 @@ This is not an exhaustive list, please carry out other necessary steps as maybe 
 
 ## 📌 Who is using this
 
-This repository aims to show how to Bicep to new developers, Solution Architects & Ops Engineers in Azure.
+This repository aims to show how to use Azure with Iac(Bicep) to new developers, Solution Architects & Ops Engineers in Azure.
 
 ### 💡 Help/Suggestions or 🐛 Bugs
 
@@ -231,14 +118,14 @@ Thank you for your interest in contributing to our project. Whether it is a bug 
 ### 📚 References
 
 
-1. [Azure Docs: Azure Storage Queue][1]
-1. [Azure Docs: Send & Receive from Queue with Python][2]
-1. [Azure Docs: Azure RBAC Role for Queue][3]
-1. [Azure Docs: Azure RBAC-ABAC Limitations][4]
-1. [Azure Docs: Just In Time Access][5]
-1. [Azure Docs: Python Queue Sample Code][6]
-1. [Azure Docs: Python Queue Client Class][7]
-1. [Azure Docs: Python Queue Message Class][8]
+1. [Azure Docs: Autoscale for VMSS][1]
+1. [Azure Docs: Custom Autoscale for VMSS with Resource Metrics][2]
+1. [Azure Docs: Monitoring Azure Queue Storage][3]
+1. [Azure Docs: Queue Storage monitoring data reference][4]
+1. [Azure Docs: Supported metrics with Azure Monitor - Queue Storage][5]
+1. [Azure Docs: Supported metrics with Azure Monitor - Queue Storage Data Collection][6]
+1. [Azure Docs: Best practices for monitoring Azure Queue Storage][7]
+1. [StackOverflow: How frequently are the Azure Storage Queue metrics updated][8]
 1. [Azure Docs: Configure pythong logging in the Azure libraries][9]
 
 
@@ -248,14 +135,14 @@ Thank you for your interest in contributing to our project. Whether it is a bug 
 
 **Level**: 300
 
-[1]: https://learn.microsoft.com/en-us/azure/storage/queues/storage-queues-introduction
-[2]: https://learn.microsoft.com/en-us/azure/storage/queues/storage-python-how-to-use-queue-storage
-[3]: https://learn.microsoft.com/en-us/azure/storage/queues/assign-azure-role-data-access
-[4]: https://learn.microsoft.com/en-us/azure/storage/common/authorize-data-access#status-of-condition-features-in-azure-storage
-[5]: https://learn.microsoft.com/en-us/azure/defender-for-cloud/just-in-time-access-usage
-[6]: https://github.com/Azure/azure-sdk-for-python/tree/azure-storage-queue_12.6.0/sdk/storage/azure-storage-queue/samples
-[7]: https://learn.microsoft.com/en-us/python/api/azure-storage-queue/azure.storage.queue.queueclient?view=azure-python#azure-storage-queue-queueclient-send-message
-[8]: https://learn.microsoft.com/en-us/python/api/azure-storage-queue/azure.storage.queue.queuemessage?view=azure-python
+[1]: https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-autoscale-overview
+[2]: https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-autoscale-overview#metric-sources
+[3]: https://learn.microsoft.com/en-us/azure/storage/queues/monitor-queue-storage
+[4]: https://learn.microsoft.com/en-us/azure/storage/queues/monitor-queue-storage-reference
+[5]: https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/metrics-supported#microsoftstoragestorageaccountsqueueservices
+[6]: https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/data-platform-metrics#data-collection
+[7]: https://learn.microsoft.com/en-us/azure/storage/queues/queues-storage-monitoring-scenarios
+[8]: https://stackoverflow.com/questions/67560805/how-frequently-are-the-azure-storage-queue-metrics-updated
 [9]: https://learn.microsoft.com/en-us/azure/developer/python/sdk/azure-sdk-logging
 
 [100]: https://www.udemy.com/course/aws-cloud-security/?referralCode=B7F1B6C78B45ADAF77A9

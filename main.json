@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.2.56959",
-      "templateHash": "5523852614339355987"
+      "templateHash": "11166690060132586373"
     }
   },
   "parameters": {
@@ -248,7 +248,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.2.56959",
-              "templateHash": "11786333467514603192"
+              "templateHash": "15986018796523732322"
             }
           },
           "parameters": {
@@ -261,13 +261,17 @@
             "tags": {
               "type": "object",
               "defaultValue": "[resourceGroup().tags]"
+            },
+            "addRandom": {
+              "type": "string",
+              "defaultValue": "[toLower(substring(uniqueString(resourceGroup().id), 0, 6))]"
             }
           },
           "resources": [
             {
               "type": "Microsoft.AppConfiguration/configurationStores",
               "apiVersion": "2023-03-01",
-              "name": "[format('{0}-config-{1}', parameters('appConfigParams').appConfigNamePrefix, parameters('deploymentParams').global_uniqueness)]",
+              "name": "[format('{0}-config-{1}-{2}', parameters('appConfigParams').appConfigNamePrefix, parameters('addRandom'), parameters('deploymentParams').global_uniqueness)]",
               "location": "[parameters('deploymentParams').location]",
               "tags": "[parameters('tags')]",
               "sku": {
@@ -278,7 +282,7 @@
           "outputs": {
             "appConfigName": {
               "type": "string",
-              "value": "[format('{0}-config-{1}', parameters('appConfigParams').appConfigNamePrefix, parameters('deploymentParams').global_uniqueness)]"
+              "value": "[format('{0}-config-{1}-{2}', parameters('appConfigParams').appConfigNamePrefix, parameters('addRandom'), parameters('deploymentParams').global_uniqueness)]"
             }
           }
         }
@@ -534,7 +538,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.2.56959",
-              "templateHash": "9901013742181982734"
+              "templateHash": "1087346129154433870"
             }
           },
           "parameters": {
@@ -591,6 +595,10 @@
             "queueName": {
               "type": "string",
               "value": "[format('{0}-q-{1}', parameters('storageQueueParams').queueNamePrefix, parameters('deploymentParams').global_uniqueness)]"
+            },
+            "queueId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Storage/storageAccounts/queueServices/queues', parameters('storageAccountName'), 'default', format('{0}-q-{1}', parameters('storageQueueParams').queueNamePrefix, parameters('deploymentParams').global_uniqueness))]"
             }
           }
         }
@@ -805,7 +813,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.2.56959",
-              "templateHash": "17982064361063820192"
+              "templateHash": "5718481397495227342"
             }
           },
           "parameters": {
@@ -872,7 +880,7 @@
             }
           },
           "variables": {
-            "userDataScript": "IyEvYmluL2Jhc2gKIyBzZXQgLWV4CnNldCAteApzZXQgLW8gcGlwZWZhaWwKCiMgdmVyc2lvbjogMTdBcHIyMDIzCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjICAgICBTRVQgR0xPQkFMUyAgICAgIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwoKUkVQT19OQU1FPSJhenVyZS1zY2FsZS12bXNzLW9uLWV2ZW50cyIKCkdJVF9SRVBPX1VSTD0iaHR0cHM6Ly9naXRodWIuY29tL21penRpaWsvJFJFUE9fTkFNRS5naXQiCgpBUFBfRElSPSIvdmFyLyRSRVBPX05BTUUiCgpMT0dfRklMRT0iL3Zhci9sb2cvbWl6dGlpay1hdXRvbWF0aW9uLWJvb3RzdHJhcC0kKGRhdGUgKyclWS0lbS0lZCcpLmxvZyIKCiMgaHR0cHM6Ly9sZWFybi5taWNyb3NvZnQuY29tL2VuLXVzL2F6dXJlL3ZpcnR1YWwtbWFjaGluZXMvbGludXgvdHV0b3JpYWwtYXV0b21hdGUtdm0tZGVwbG95bWVudAoKaW5zdHJ1Y3Rpb24oKQp7CiAgZWNobyAidXNhZ2U6IC4vYnVpbGQuc2ggcGFja2FnZSA8c3RhZ2U+IDxyZWdpb24+IgogIGVjaG8gIiIKICBlY2hvICIvYnVpbGQuc2ggZGVwbG95IDxzdGFnZT4gPHJlZ2lvbj4gPHBrZ19kaXI+IgogIGVjaG8gIiIKICBlY2hvICIvYnVpbGQuc2ggdGVzdC08dGVzdF90eXBlPiA8c3RhZ2U+Igp9Cgpsb2dfdGhpcygpIHsKICAjIENhbGxpbmcgdGhpcyBmdW5jdGlvbiBsaWtlIGxvZ190aGlzICJCZWdpbiBpbnN0YWxsYXRpb24iIHdpbGwgcmVzdWx0IGxvZyBsaWtlIGJlbG93CiAgIyB7InRpbWVzdGFtcCI6ICIyMDIzLTA0LTE1VDEwOjIyOjIzWiIsICJtZXNzYWdlIjogIkJlZ2luIGluc3RhbGxhdGlvbiJ9CiAgICBsb2NhbCB0aW1lc3RhbXA9JChkYXRlIC11ICsiJVktJW0tJWRUJUg6JU06JVNaIikKICAgIGxvY2FsIG1lc3NhZ2U9JChwcmludGYgJyVzJyAiJCoiIHwgc2VkICdzLyIvXFwiL2cnKSAjIEVzY2FwaW5nIGRvdWJsZSBxdW90ZXMKICAgIHByaW50ZiAneyJ0aW1lc3RhbXAiOiAiJXMiLCAibWVzc2FnZSI6ICIlcyJ9XG4nICIkdGltZXN0YW1wIiAiJG1lc3NhZ2UiCn0KCmFzc3VtZV9yb2xlKCkgewogIGlmIFsgLW4gIiRERVBMT1lFUl9ST0xFX0FSTiIgXTsgdGhlbgogICAgZWNobyAiQXNzdW1pbmcgcm9sZSAkREVQTE9ZRVJfUk9MRV9BUk4gLi4uIgogIGZpCn0KCnVuYXNzdW1lX3JvbGUoKSB7CiAgdW5zZXQgVE9LRU4KfQoKZnVuY3Rpb24gY2xvbmVfZ2l0X3JlcG8oKXsKICBsb2dfdGhpcyAiQ2xvbmluZyBSZXBvIgogICAgIyBta2RpciAtcCAvdmFyLwogICAgY2QgL3ZhcgogICAgZ2l0IGNsb25lICRHSVRfUkVQT19VUkwKICAgIGNkIC92YXIvJFJFUE9fTkFNRQp9CgpmdW5jdGlvbiBhZGRfZW52X3ZhcnMoKXsKICAgIElNRFM9YGN1cmwgLXMgLUggTWV0YWRhdGE6dHJ1ZSAtLW5vcHJveHkgIioiICJodHRwOi8vMTY5LjI1NC4xNjkuMjU0L21ldGFkYXRhL2luc3RhbmNlP2FwaS12ZXJzaW9uPTIwMjEtMDItMDEiYAogICAgZGVjbGFyZSAtZyBVU0VSX0RBVEFfU0NSSVBUPWBjdXJsIC1IIE1ldGFkYXRhOnRydWUgLS1ub3Byb3h5ICIqIiAiaHR0cDovLzE2OS4yNTQuMTY5LjI1NC9tZXRhZGF0YS9pbnN0YW5jZS9jb21wdXRlL3VzZXJEYXRhP2FwaS12ZXJzaW9uPTIwMjEtMDEtMDEmZm9ybWF0PXRleHQiIHwgYmFzZTY0IC0tZGVjb2RlYAp9CgpmdW5jdGlvbiBpbnN0YWxsX2xpYnNfb25fdWJ1bnR1KCl7CiAgbG9nX3RoaXMgIkJlZ2luIEF6dXJlIENMSSBJbnN0YWxsYXRpb24iCiAgIyBodHRwczovL2xlYXJuLm1pY3Jvc29mdC5jb20vZW4tdXMvY2xpL2F6dXJlL2luc3RhbGwtYXp1cmUtY2xpLWxpbnV4P3Bpdm90cz1hcHQKICBjdXJsIC1zTCBodHRwczovL2FrYS5tcy9JbnN0YWxsQXp1cmVDTElEZWIgfCBzdWRvIGJhc2gKCiAgIyBJbml0aWF0ZSBheiBsb2dpbgogCiAgYXogY29uZmlnIHNldCBleHRlbnNpb24udXNlX2R5bmFtaWNfaW5zdGFsbD15ZXNfd2l0aG91dF9wcm9tcHQKICBheiBsb2dpbiAtLWlkZW50aXR5CgogIGxvZ190aGlzICJCZWdpbiBqcSwgZ2l0LCBweXRob24zLXBpcCBJbnN0YWxsYXRpb24iCgogIHN1ZG8gYXB0LWdldCAteSBpbnN0YWxsIGpxCiAgc3VkbyBhcHQtZ2V0IC15IGluc3RhbGwgZ2l0CiAgc3VkbyBhcHQtZ2V0IC15IGluc3RhbGwgcHl0aG9uMy1waXAKICAKICBsb2dfdGhpcyAiRW5kICBqcSwgZ2l0LCBweXRob24zLXBpcCBJbnN0YWxsYXRpb24iCn0KCmZ1bmN0aW9uIGluc3RhbGxfYXp1cmVfcHl0aG9uX3NkaygpewogIGxvZ190aGlzICJCZWdpbiBBenVyZSBQeXRob24gU0RLIEluc3RhbGxhdGlvbiIKICAKICBweXRob24zIC1tIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIC0tdXBncmFkZSBpbnN0YWxsIGF6dXJlLWlkZW50aXR5CiAgcHl0aG9uMyAtbSBwaXAgaW5zdGFsbCAtLW5vLWNhY2hlLWRpciAtLXVwZ3JhZGUgaW5zdGFsbCBhenVyZS1zdG9yYWdlLWJsb2IKICBweXRob24zIC1tIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIC0tdXBncmFkZSBpbnN0YWxsIGF6dXJlLXN0b3JhZ2UtcXVldWUKICBweXRob24zIC1tIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIC0tdXBncmFkZSBpbnN0YWxsIGF6dXJlLWFwcGNvbmZpZ3VyYXRpb24tcHJvdmlkZXIKICAKICBsb2dfdGhpcyAiRW5kIG9mIEF6dXJlIFB5dGhvbiBTREsgSW5zdGFsbGF0aW9uIgp9CgpmdW5jdGlvbiBpbnN0YWxsX2xpYnMoKXsKICAgICMgUHJlcGFyZSB0aGUgc2VydmVyIGZvciBweXRob24zCiAgICBzdWRvIHl1bSAteSBpbnN0YWxsIGdpdCBqcQogICAgc3VkbyB5dW0gLXkgaW5zdGFsbCBweXRob24zLXBpcAogICAgc3VkbyB5dW0gLXkgaW5zdGFsbCBweXRob24zIAp9CgoKZnVuY3Rpb24gaW5zdGFsbF9ub2RlanMoKXsKICAgIGN1cmwgLW8tIGh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9udm0tc2gvbnZtL3YwLjM0LjAvaW5zdGFsbC5zaCB8IGJhc2gKICAgIC4gfi8ubnZtL252bS5zaAogICAgbnZtIGluc3RhbGwgbm9kZQogICAgbm9kZSAtZSAiY29uc29sZS5sb2coJ1J1bm5pbmcgTm9kZS5qcyAnICsgcHJvY2Vzcy52ZXJzaW9uKSIKfQoKZnVuY3Rpb24gY2hlY2tfZXhlY3V0aW9uKCl7CiAgbG9nX3RoaXMgIkJlZ2luIE1penRpaWsgQ3VzdG9taXNhdGlvbiIKICAgIGxvZ190aGlzICJoZWxsbyIgPi92YXIvbG9nL21penRpaWsubG9nCn0KCmNoZWNrX2V4ZWN1dGlvbiAgICAgICAgICAgICAgICAgfCB0ZWUgLWEgIiR7TE9HX0ZJTEV9IgppbnN0YWxsX2xpYnNfb25fdWJ1bnR1ICAgICAgICAgIHwgdGVlIC1hICIke0xPR19GSUxFfSIKaW5zdGFsbF9henVyZV9weXRob25fc2RrICAgICAgICB8IHRlZSAtYSAiJHtMT0dfRklMRX0iCmNsb25lX2dpdF9yZXBvICAgICAgICAgICAgICAgICAgfCB0ZWUgLWEgIiR7TE9HX0ZJTEV9Igpsb2dfdGhpcyAiYm9vdHN0cmFwX3N1Y2Nlc3M6eWVzIiB8IHRlZSAtYSAiJHtMT0dfRklMRX0iCgoKCgo=",
+            "userDataScript": "IyEvYmluL2Jhc2gKIyBzZXQgLWV4CnNldCAteApzZXQgLW8gcGlwZWZhaWwKCiMgdmVyc2lvbjogMTdBcHIyMDIzCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjICAgICBTRVQgR0xPQkFMUyAgICAgIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwoKUkVQT19OQU1FPSJhenVyZS1zY2FsZS12bXNzLW9uLWV2ZW50cyIKCkdJVF9SRVBPX1VSTD0iaHR0cHM6Ly9naXRodWIuY29tL21penRpaWsvJFJFUE9fTkFNRS5naXQiCgpBUFBfRElSPSIvdmFyLyRSRVBPX05BTUUiCgpMT0dfRklMRT0iL3Zhci9sb2cvbWl6dGlpay1hdXRvbWF0aW9uLWJvb3RzdHJhcC0kKGRhdGUgKyclWS0lbS0lZCcpLmxvZyIKCiMgaHR0cHM6Ly9sZWFybi5taWNyb3NvZnQuY29tL2VuLXVzL2F6dXJlL3ZpcnR1YWwtbWFjaGluZXMvbGludXgvdHV0b3JpYWwtYXV0b21hdGUtdm0tZGVwbG95bWVudAoKaW5zdHJ1Y3Rpb24oKQp7CiAgZWNobyAidXNhZ2U6IC4vYnVpbGQuc2ggcGFja2FnZSA8c3RhZ2U+IDxyZWdpb24+IgogIGVjaG8gIiIKICBlY2hvICIvYnVpbGQuc2ggZGVwbG95IDxzdGFnZT4gPHJlZ2lvbj4gPHBrZ19kaXI+IgogIGVjaG8gIiIKICBlY2hvICIvYnVpbGQuc2ggdGVzdC08dGVzdF90eXBlPiA8c3RhZ2U+Igp9Cgpsb2dfdGhpcygpIHsKICAjIENhbGxpbmcgdGhpcyBmdW5jdGlvbiBsaWtlIGxvZ190aGlzICJCZWdpbiBpbnN0YWxsYXRpb24iIHdpbGwgcmVzdWx0IGxvZyBsaWtlIGJlbG93CiAgIyB7InRpbWVzdGFtcCI6ICIyMDIzLTA0LTE1VDEwOjIyOjIzWiIsICJtZXNzYWdlIjogIkJlZ2luIGluc3RhbGxhdGlvbiJ9CiAgICBsb2NhbCB0aW1lc3RhbXA9JChkYXRlIC11ICsiJVktJW0tJWRUJUg6JU06JVNaIikKICAgIGxvY2FsIG1lc3NhZ2U9JChwcmludGYgJyVzJyAiJCoiIHwgc2VkICdzLyIvXFwiL2cnKSAjIEVzY2FwaW5nIGRvdWJsZSBxdW90ZXMKICAgIHByaW50ZiAneyJ0aW1lc3RhbXAiOiAiJXMiLCAibWVzc2FnZSI6ICIlcyJ9XG4nICIkdGltZXN0YW1wIiAiJG1lc3NhZ2UiCn0KCmFzc3VtZV9yb2xlKCkgewogIGlmIFsgLW4gIiRERVBMT1lFUl9ST0xFX0FSTiIgXTsgdGhlbgogICAgZWNobyAiQXNzdW1pbmcgcm9sZSAkREVQTE9ZRVJfUk9MRV9BUk4gLi4uIgogIGZpCn0KCnVuYXNzdW1lX3JvbGUoKSB7CiAgdW5zZXQgVE9LRU4KfQoKZnVuY3Rpb24gY2xvbmVfZ2l0X3JlcG8oKXsKICBsb2dfdGhpcyAiQ2xvbmluZyBSZXBvIgogICAgIyBta2RpciAtcCAvdmFyLwogICAgY2QgL3ZhcgogICAgZ2l0IGNsb25lICRHSVRfUkVQT19VUkwKICAgIGNkIC92YXIvJFJFUE9fTkFNRQp9CgpmdW5jdGlvbiBhZGRfZW52X3ZhcnMoKXsKICAgIElNRFM9YGN1cmwgLXMgLUggTWV0YWRhdGE6dHJ1ZSAtLW5vcHJveHkgIioiICJodHRwOi8vMTY5LjI1NC4xNjkuMjU0L21ldGFkYXRhL2luc3RhbmNlP2FwaS12ZXJzaW9uPTIwMjEtMDItMDEiYAogICAgZGVjbGFyZSAtZyBVU0VSX0RBVEFfU0NSSVBUPWBjdXJsIC1IIE1ldGFkYXRhOnRydWUgLS1ub3Byb3h5ICIqIiAiaHR0cDovLzE2OS4yNTQuMTY5LjI1NC9tZXRhZGF0YS9pbnN0YW5jZS9jb21wdXRlL3VzZXJEYXRhP2FwaS12ZXJzaW9uPTIwMjEtMDEtMDEmZm9ybWF0PXRleHQiIHwgYmFzZTY0IC0tZGVjb2RlYAp9CgpmdW5jdGlvbiBpbnN0YWxsX2xpYnNfb25fdWJ1bnR1KCl7CiAgbG9nX3RoaXMgIkJlZ2luIEF6dXJlIENMSSBJbnN0YWxsYXRpb24iCiAgIyBodHRwczovL2xlYXJuLm1pY3Jvc29mdC5jb20vZW4tdXMvY2xpL2F6dXJlL2luc3RhbGwtYXp1cmUtY2xpLWxpbnV4P3Bpdm90cz1hcHQKICBjdXJsIC1zTCBodHRwczovL2FrYS5tcy9JbnN0YWxsQXp1cmVDTElEZWIgfCBzdWRvIGJhc2gKCiAgIyBJbml0aWF0ZSBheiBsb2dpbgogCiAgYXogY29uZmlnIHNldCBleHRlbnNpb24udXNlX2R5bmFtaWNfaW5zdGFsbD15ZXNfd2l0aG91dF9wcm9tcHQKICBheiBsb2dpbiAtLWlkZW50aXR5CgogIGxvZ190aGlzICJCZWdpbiBqcSwgZ2l0LCBweXRob24zLXBpcCBJbnN0YWxsYXRpb24iCgogIHN1ZG8gYXB0LWdldCAteSBpbnN0YWxsIGpxCiAgc3VkbyBhcHQtZ2V0IC15IGluc3RhbGwgZ2l0CiAgc3VkbyBhcHQtZ2V0IC15IGluc3RhbGwgcHl0aG9uMy1waXAKICAKICBsb2dfdGhpcyAiRW5kICBqcSwgZ2l0LCBweXRob24zLXBpcCBJbnN0YWxsYXRpb24iCn0KCmZ1bmN0aW9uIGluc3RhbGxfYXp1cmVfcHl0aG9uX3NkaygpewogIGxvZ190aGlzICJCZWdpbiBBenVyZSBQeXRob24gU0RLIEluc3RhbGxhdGlvbiIKICAKICBweXRob24zIC1tIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIC0tdXBncmFkZSBpbnN0YWxsIGF6dXJlLWlkZW50aXR5CiAgcHl0aG9uMyAtbSBwaXAgaW5zdGFsbCAtLW5vLWNhY2hlLWRpciAtLXVwZ3JhZGUgaW5zdGFsbCBhenVyZS1zdG9yYWdlLWJsb2IKICBweXRob24zIC1tIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIC0tdXBncmFkZSBpbnN0YWxsIGF6dXJlLXN0b3JhZ2UtcXVldWUKICBweXRob24zIC1tIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIC0tdXBncmFkZSBpbnN0YWxsIGF6dXJlLWFwcGNvbmZpZ3VyYXRpb24tcHJvdmlkZXIKICAKICBsb2dfdGhpcyAiRW5kIG9mIEF6dXJlIFB5dGhvbiBTREsgSW5zdGFsbGF0aW9uIgp9CgpmdW5jdGlvbiBpbnN0YWxsX2xpYnMoKXsKICAgICMgUHJlcGFyZSB0aGUgc2VydmVyIGZvciBweXRob24zCiAgICBzdWRvIHl1bSAteSBpbnN0YWxsIGdpdCBqcQogICAgc3VkbyB5dW0gLXkgaW5zdGFsbCBweXRob24zLXBpcAogICAgc3VkbyB5dW0gLXkgaW5zdGFsbCBweXRob24zIAp9CgoKZnVuY3Rpb24gaW5zdGFsbF9ub2RlanMoKXsKICAgIGN1cmwgLW8tIGh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9udm0tc2gvbnZtL3YwLjM0LjAvaW5zdGFsbC5zaCB8IGJhc2gKICAgIC4gfi8ubnZtL252bS5zaAogICAgbnZtIGluc3RhbGwgbm9kZQogICAgbm9kZSAtZSAiY29uc29sZS5sb2coJ1J1bm5pbmcgTm9kZS5qcyAnICsgcHJvY2Vzcy52ZXJzaW9uKSIKfQoKZnVuY3Rpb24gY2hlY2tfZXhlY3V0aW9uKCl7CiAgSE9TVF9GUUROPSQoaG9zdG5hbWUpCiAgSE9TVF9JUD0kKGhvc3RuYW1lIC1JKQogIGxvZ190aGlzICJCZWdpbiBNaXp0aWlrIEN1c3RvbWlzYXRpb24gb2YgSG9zdDogJHtIT1NUX0ZRRE59IC0gJHtIT1NUX0lQfSIKICBsb2dfdGhpcyAiaGVsbG8iID4vdmFyL2xvZy9taXp0aWlrLmxvZwp9CgpjaGVja19leGVjdXRpb24gICAgICAgICAgICAgICAgIHwgdGVlIC1hICIke0xPR19GSUxFfSIKaW5zdGFsbF9saWJzX29uX3VidW50dSAgICAgICAgICB8IHRlZSAtYSAiJHtMT0dfRklMRX0iCmluc3RhbGxfYXp1cmVfcHl0aG9uX3NkayAgICAgICAgfCB0ZWUgLWEgIiR7TE9HX0ZJTEV9IgpjbG9uZV9naXRfcmVwbyAgICAgICAgICAgICAgICAgIHwgdGVlIC1hICIke0xPR19GSUxFfSIKY2hlY2tfZXhlY3V0aW9uICAgICAgICAgICAgICAgICB8IHRlZSAtYSAiJHtMT0dfRklMRX0iCgoKCgo=",
             "LinuxConfiguration": {
               "disablePasswordAuthentication": true,
               "ssh": {
@@ -1298,6 +1306,18 @@
           "appConfigName": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Config', parameters('storageAccountParams').storageAccountNamePrefix, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.appConfigName.value]"
           },
+          "queueId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Sq', parameters('storageAccountParams').storageAccountNamePrefix, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.queueId.value]"
+          },
+          "linDataCollectionEndpointId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Dce', parameters('dceParams').endpointNamePrefix, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.linDataCollectionEndpointId.value]"
+          },
+          "storeEventsDcrId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Dcr', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.storeEventsDcrId.value]"
+          },
+          "automationEventsDcrId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Dcr', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness)), '2022-09-01').outputs.automationEventsDcrId.value]"
+          },
           "tags": {
             "value": "[parameters('tags')]"
           }
@@ -1309,7 +1329,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.2.56959",
-              "templateHash": "5776188223022217540"
+              "templateHash": "4748277998133849612"
             }
           },
           "parameters": {
@@ -1326,6 +1346,9 @@
             "appConfigName": {
               "type": "string"
             },
+            "queueId": {
+              "type": "string"
+            },
             "vmSku": {
               "type": "string",
               "defaultValue": "Standard_D2lds_v5"
@@ -1340,7 +1363,7 @@
             },
             "platformFaultDomainCount": {
               "type": "int",
-              "defaultValue": 1
+              "defaultValue": 5
             },
             "vmParams": {
               "type": "object"
@@ -1351,10 +1374,19 @@
             "vmName": {
               "type": "string",
               "defaultValue": "[format('{0}-{1}', parameters('vmParams').vmNamePrefix, parameters('deploymentParams').global_uniqueness)]"
+            },
+            "linDataCollectionEndpointId": {
+              "type": "string"
+            },
+            "storeEventsDcrId": {
+              "type": "string"
+            },
+            "automationEventsDcrId": {
+              "type": "string"
             }
           },
           "variables": {
-            "userDataScript": "IyEvYmluL2Jhc2gKIyBzZXQgLWV4CnNldCAteApzZXQgLW8gcGlwZWZhaWwKCiMgdmVyc2lvbjogMTdBcHIyMDIzCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjICAgICBTRVQgR0xPQkFMUyAgICAgIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwoKUkVQT19OQU1FPSJhenVyZS1zY2FsZS12bXNzLW9uLWV2ZW50cyIKCkdJVF9SRVBPX1VSTD0iaHR0cHM6Ly9naXRodWIuY29tL21penRpaWsvJFJFUE9fTkFNRS5naXQiCgpBUFBfRElSPSIvdmFyLyRSRVBPX05BTUUiCgpMT0dfRklMRT0iL3Zhci9sb2cvbWl6dGlpay1hdXRvbWF0aW9uLWJvb3RzdHJhcC0kKGRhdGUgKyclWS0lbS0lZCcpLmxvZyIKCiMgaHR0cHM6Ly9sZWFybi5taWNyb3NvZnQuY29tL2VuLXVzL2F6dXJlL3ZpcnR1YWwtbWFjaGluZXMvbGludXgvdHV0b3JpYWwtYXV0b21hdGUtdm0tZGVwbG95bWVudAoKaW5zdHJ1Y3Rpb24oKQp7CiAgZWNobyAidXNhZ2U6IC4vYnVpbGQuc2ggcGFja2FnZSA8c3RhZ2U+IDxyZWdpb24+IgogIGVjaG8gIiIKICBlY2hvICIvYnVpbGQuc2ggZGVwbG95IDxzdGFnZT4gPHJlZ2lvbj4gPHBrZ19kaXI+IgogIGVjaG8gIiIKICBlY2hvICIvYnVpbGQuc2ggdGVzdC08dGVzdF90eXBlPiA8c3RhZ2U+Igp9Cgpsb2dfdGhpcygpIHsKICAjIENhbGxpbmcgdGhpcyBmdW5jdGlvbiBsaWtlIGxvZ190aGlzICJCZWdpbiBpbnN0YWxsYXRpb24iIHdpbGwgcmVzdWx0IGxvZyBsaWtlIGJlbG93CiAgIyB7InRpbWVzdGFtcCI6ICIyMDIzLTA0LTE1VDEwOjIyOjIzWiIsICJtZXNzYWdlIjogIkJlZ2luIGluc3RhbGxhdGlvbiJ9CiAgICBsb2NhbCB0aW1lc3RhbXA9JChkYXRlIC11ICsiJVktJW0tJWRUJUg6JU06JVNaIikKICAgIGxvY2FsIG1lc3NhZ2U9JChwcmludGYgJyVzJyAiJCoiIHwgc2VkICdzLyIvXFwiL2cnKSAjIEVzY2FwaW5nIGRvdWJsZSBxdW90ZXMKICAgIHByaW50ZiAneyJ0aW1lc3RhbXAiOiAiJXMiLCAibWVzc2FnZSI6ICIlcyJ9XG4nICIkdGltZXN0YW1wIiAiJG1lc3NhZ2UiCn0KCmFzc3VtZV9yb2xlKCkgewogIGlmIFsgLW4gIiRERVBMT1lFUl9ST0xFX0FSTiIgXTsgdGhlbgogICAgZWNobyAiQXNzdW1pbmcgcm9sZSAkREVQTE9ZRVJfUk9MRV9BUk4gLi4uIgogIGZpCn0KCnVuYXNzdW1lX3JvbGUoKSB7CiAgdW5zZXQgVE9LRU4KfQoKZnVuY3Rpb24gY2xvbmVfZ2l0X3JlcG8oKXsKICBsb2dfdGhpcyAiQ2xvbmluZyBSZXBvIgogICAgIyBta2RpciAtcCAvdmFyLwogICAgY2QgL3ZhcgogICAgZ2l0IGNsb25lICRHSVRfUkVQT19VUkwKICAgIGNkIC92YXIvJFJFUE9fTkFNRQp9CgpmdW5jdGlvbiBhZGRfZW52X3ZhcnMoKXsKICAgIElNRFM9YGN1cmwgLXMgLUggTWV0YWRhdGE6dHJ1ZSAtLW5vcHJveHkgIioiICJodHRwOi8vMTY5LjI1NC4xNjkuMjU0L21ldGFkYXRhL2luc3RhbmNlP2FwaS12ZXJzaW9uPTIwMjEtMDItMDEiYAogICAgZGVjbGFyZSAtZyBVU0VSX0RBVEFfU0NSSVBUPWBjdXJsIC1IIE1ldGFkYXRhOnRydWUgLS1ub3Byb3h5ICIqIiAiaHR0cDovLzE2OS4yNTQuMTY5LjI1NC9tZXRhZGF0YS9pbnN0YW5jZS9jb21wdXRlL3VzZXJEYXRhP2FwaS12ZXJzaW9uPTIwMjEtMDEtMDEmZm9ybWF0PXRleHQiIHwgYmFzZTY0IC0tZGVjb2RlYAp9CgpmdW5jdGlvbiBpbnN0YWxsX2xpYnNfb25fdWJ1bnR1KCl7CiAgbG9nX3RoaXMgIkJlZ2luIEF6dXJlIENMSSBJbnN0YWxsYXRpb24iCiAgIyBodHRwczovL2xlYXJuLm1pY3Jvc29mdC5jb20vZW4tdXMvY2xpL2F6dXJlL2luc3RhbGwtYXp1cmUtY2xpLWxpbnV4P3Bpdm90cz1hcHQKICBjdXJsIC1zTCBodHRwczovL2FrYS5tcy9JbnN0YWxsQXp1cmVDTElEZWIgfCBzdWRvIGJhc2gKCiAgIyBJbml0aWF0ZSBheiBsb2dpbgogCiAgYXogY29uZmlnIHNldCBleHRlbnNpb24udXNlX2R5bmFtaWNfaW5zdGFsbD15ZXNfd2l0aG91dF9wcm9tcHQKICBheiBsb2dpbiAtLWlkZW50aXR5CgogIGxvZ190aGlzICJCZWdpbiBqcSwgZ2l0LCBweXRob24zLXBpcCBJbnN0YWxsYXRpb24iCgogIHN1ZG8gYXB0LWdldCAteSBpbnN0YWxsIGpxCiAgc3VkbyBhcHQtZ2V0IC15IGluc3RhbGwgZ2l0CiAgc3VkbyBhcHQtZ2V0IC15IGluc3RhbGwgcHl0aG9uMy1waXAKICAKICBsb2dfdGhpcyAiRW5kICBqcSwgZ2l0LCBweXRob24zLXBpcCBJbnN0YWxsYXRpb24iCn0KCmZ1bmN0aW9uIGluc3RhbGxfYXp1cmVfcHl0aG9uX3NkaygpewogIGxvZ190aGlzICJCZWdpbiBBenVyZSBQeXRob24gU0RLIEluc3RhbGxhdGlvbiIKICAKICBweXRob24zIC1tIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIC0tdXBncmFkZSBpbnN0YWxsIGF6dXJlLWlkZW50aXR5CiAgcHl0aG9uMyAtbSBwaXAgaW5zdGFsbCAtLW5vLWNhY2hlLWRpciAtLXVwZ3JhZGUgaW5zdGFsbCBhenVyZS1zdG9yYWdlLWJsb2IKICBweXRob24zIC1tIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIC0tdXBncmFkZSBpbnN0YWxsIGF6dXJlLXN0b3JhZ2UtcXVldWUKICBweXRob24zIC1tIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIC0tdXBncmFkZSBpbnN0YWxsIGF6dXJlLWFwcGNvbmZpZ3VyYXRpb24tcHJvdmlkZXIKICAKICBsb2dfdGhpcyAiRW5kIG9mIEF6dXJlIFB5dGhvbiBTREsgSW5zdGFsbGF0aW9uIgp9CgpmdW5jdGlvbiBpbnN0YWxsX2xpYnMoKXsKICAgICMgUHJlcGFyZSB0aGUgc2VydmVyIGZvciBweXRob24zCiAgICBzdWRvIHl1bSAteSBpbnN0YWxsIGdpdCBqcQogICAgc3VkbyB5dW0gLXkgaW5zdGFsbCBweXRob24zLXBpcAogICAgc3VkbyB5dW0gLXkgaW5zdGFsbCBweXRob24zIAp9CgoKZnVuY3Rpb24gaW5zdGFsbF9ub2RlanMoKXsKICAgIGN1cmwgLW8tIGh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9udm0tc2gvbnZtL3YwLjM0LjAvaW5zdGFsbC5zaCB8IGJhc2gKICAgIC4gfi8ubnZtL252bS5zaAogICAgbnZtIGluc3RhbGwgbm9kZQogICAgbm9kZSAtZSAiY29uc29sZS5sb2coJ1J1bm5pbmcgTm9kZS5qcyAnICsgcHJvY2Vzcy52ZXJzaW9uKSIKfQoKZnVuY3Rpb24gY2hlY2tfZXhlY3V0aW9uKCl7CiAgbG9nX3RoaXMgIkJlZ2luIE1penRpaWsgQ3VzdG9taXNhdGlvbiIKICAgIGxvZ190aGlzICJoZWxsbyIgPi92YXIvbG9nL21penRpaWsubG9nCn0KCmNoZWNrX2V4ZWN1dGlvbiAgICAgICAgICAgICAgICAgfCB0ZWUgLWEgIiR7TE9HX0ZJTEV9IgppbnN0YWxsX2xpYnNfb25fdWJ1bnR1ICAgICAgICAgIHwgdGVlIC1hICIke0xPR19GSUxFfSIKaW5zdGFsbF9henVyZV9weXRob25fc2RrICAgICAgICB8IHRlZSAtYSAiJHtMT0dfRklMRX0iCmNsb25lX2dpdF9yZXBvICAgICAgICAgICAgICAgICAgfCB0ZWUgLWEgIiR7TE9HX0ZJTEV9Igpsb2dfdGhpcyAiYm9vdHN0cmFwX3N1Y2Nlc3M6eWVzIiB8IHRlZSAtYSAiJHtMT0dfRklMRX0iCgoKCgo=",
+            "userDataScript": "IyEvYmluL2Jhc2gKIyBzZXQgLWV4CnNldCAteApzZXQgLW8gcGlwZWZhaWwKCiMgdmVyc2lvbjogMTdBcHIyMDIzCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjICAgICBTRVQgR0xPQkFMUyAgICAgIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwoKUkVQT19OQU1FPSJhenVyZS1zY2FsZS12bXNzLW9uLWV2ZW50cyIKCkdJVF9SRVBPX1VSTD0iaHR0cHM6Ly9naXRodWIuY29tL21penRpaWsvJFJFUE9fTkFNRS5naXQiCgpBUFBfRElSPSIvdmFyLyRSRVBPX05BTUUiCgpMT0dfRklMRT0iL3Zhci9sb2cvbWl6dGlpay1hdXRvbWF0aW9uLWJvb3RzdHJhcC0kKGRhdGUgKyclWS0lbS0lZCcpLmxvZyIKCiMgaHR0cHM6Ly9sZWFybi5taWNyb3NvZnQuY29tL2VuLXVzL2F6dXJlL3ZpcnR1YWwtbWFjaGluZXMvbGludXgvdHV0b3JpYWwtYXV0b21hdGUtdm0tZGVwbG95bWVudAoKaW5zdHJ1Y3Rpb24oKQp7CiAgZWNobyAidXNhZ2U6IC4vYnVpbGQuc2ggcGFja2FnZSA8c3RhZ2U+IDxyZWdpb24+IgogIGVjaG8gIiIKICBlY2hvICIvYnVpbGQuc2ggZGVwbG95IDxzdGFnZT4gPHJlZ2lvbj4gPHBrZ19kaXI+IgogIGVjaG8gIiIKICBlY2hvICIvYnVpbGQuc2ggdGVzdC08dGVzdF90eXBlPiA8c3RhZ2U+Igp9Cgpsb2dfdGhpcygpIHsKICAjIENhbGxpbmcgdGhpcyBmdW5jdGlvbiBsaWtlIGxvZ190aGlzICJCZWdpbiBpbnN0YWxsYXRpb24iIHdpbGwgcmVzdWx0IGxvZyBsaWtlIGJlbG93CiAgIyB7InRpbWVzdGFtcCI6ICIyMDIzLTA0LTE1VDEwOjIyOjIzWiIsICJtZXNzYWdlIjogIkJlZ2luIGluc3RhbGxhdGlvbiJ9CiAgICBsb2NhbCB0aW1lc3RhbXA9JChkYXRlIC11ICsiJVktJW0tJWRUJUg6JU06JVNaIikKICAgIGxvY2FsIG1lc3NhZ2U9JChwcmludGYgJyVzJyAiJCoiIHwgc2VkICdzLyIvXFwiL2cnKSAjIEVzY2FwaW5nIGRvdWJsZSBxdW90ZXMKICAgIHByaW50ZiAneyJ0aW1lc3RhbXAiOiAiJXMiLCAibWVzc2FnZSI6ICIlcyJ9XG4nICIkdGltZXN0YW1wIiAiJG1lc3NhZ2UiCn0KCmFzc3VtZV9yb2xlKCkgewogIGlmIFsgLW4gIiRERVBMT1lFUl9ST0xFX0FSTiIgXTsgdGhlbgogICAgZWNobyAiQXNzdW1pbmcgcm9sZSAkREVQTE9ZRVJfUk9MRV9BUk4gLi4uIgogIGZpCn0KCnVuYXNzdW1lX3JvbGUoKSB7CiAgdW5zZXQgVE9LRU4KfQoKZnVuY3Rpb24gY2xvbmVfZ2l0X3JlcG8oKXsKICBsb2dfdGhpcyAiQ2xvbmluZyBSZXBvIgogICAgIyBta2RpciAtcCAvdmFyLwogICAgY2QgL3ZhcgogICAgZ2l0IGNsb25lICRHSVRfUkVQT19VUkwKICAgIGNkIC92YXIvJFJFUE9fTkFNRQp9CgpmdW5jdGlvbiBhZGRfZW52X3ZhcnMoKXsKICAgIElNRFM9YGN1cmwgLXMgLUggTWV0YWRhdGE6dHJ1ZSAtLW5vcHJveHkgIioiICJodHRwOi8vMTY5LjI1NC4xNjkuMjU0L21ldGFkYXRhL2luc3RhbmNlP2FwaS12ZXJzaW9uPTIwMjEtMDItMDEiYAogICAgZGVjbGFyZSAtZyBVU0VSX0RBVEFfU0NSSVBUPWBjdXJsIC1IIE1ldGFkYXRhOnRydWUgLS1ub3Byb3h5ICIqIiAiaHR0cDovLzE2OS4yNTQuMTY5LjI1NC9tZXRhZGF0YS9pbnN0YW5jZS9jb21wdXRlL3VzZXJEYXRhP2FwaS12ZXJzaW9uPTIwMjEtMDEtMDEmZm9ybWF0PXRleHQiIHwgYmFzZTY0IC0tZGVjb2RlYAp9CgpmdW5jdGlvbiBpbnN0YWxsX2xpYnNfb25fdWJ1bnR1KCl7CiAgbG9nX3RoaXMgIkJlZ2luIEF6dXJlIENMSSBJbnN0YWxsYXRpb24iCiAgIyBodHRwczovL2xlYXJuLm1pY3Jvc29mdC5jb20vZW4tdXMvY2xpL2F6dXJlL2luc3RhbGwtYXp1cmUtY2xpLWxpbnV4P3Bpdm90cz1hcHQKICBjdXJsIC1zTCBodHRwczovL2FrYS5tcy9JbnN0YWxsQXp1cmVDTElEZWIgfCBzdWRvIGJhc2gKCiAgIyBJbml0aWF0ZSBheiBsb2dpbgogCiAgYXogY29uZmlnIHNldCBleHRlbnNpb24udXNlX2R5bmFtaWNfaW5zdGFsbD15ZXNfd2l0aG91dF9wcm9tcHQKICBheiBsb2dpbiAtLWlkZW50aXR5CgogIGxvZ190aGlzICJCZWdpbiBqcSwgZ2l0LCBweXRob24zLXBpcCBJbnN0YWxsYXRpb24iCgogIHN1ZG8gYXB0LWdldCAteSBpbnN0YWxsIGpxCiAgc3VkbyBhcHQtZ2V0IC15IGluc3RhbGwgZ2l0CiAgc3VkbyBhcHQtZ2V0IC15IGluc3RhbGwgcHl0aG9uMy1waXAKICAKICBsb2dfdGhpcyAiRW5kICBqcSwgZ2l0LCBweXRob24zLXBpcCBJbnN0YWxsYXRpb24iCn0KCmZ1bmN0aW9uIGluc3RhbGxfYXp1cmVfcHl0aG9uX3NkaygpewogIGxvZ190aGlzICJCZWdpbiBBenVyZSBQeXRob24gU0RLIEluc3RhbGxhdGlvbiIKICAKICBweXRob24zIC1tIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIC0tdXBncmFkZSBpbnN0YWxsIGF6dXJlLWlkZW50aXR5CiAgcHl0aG9uMyAtbSBwaXAgaW5zdGFsbCAtLW5vLWNhY2hlLWRpciAtLXVwZ3JhZGUgaW5zdGFsbCBhenVyZS1zdG9yYWdlLWJsb2IKICBweXRob24zIC1tIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIC0tdXBncmFkZSBpbnN0YWxsIGF6dXJlLXN0b3JhZ2UtcXVldWUKICBweXRob24zIC1tIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIC0tdXBncmFkZSBpbnN0YWxsIGF6dXJlLWFwcGNvbmZpZ3VyYXRpb24tcHJvdmlkZXIKICAKICBsb2dfdGhpcyAiRW5kIG9mIEF6dXJlIFB5dGhvbiBTREsgSW5zdGFsbGF0aW9uIgp9CgpmdW5jdGlvbiBpbnN0YWxsX2xpYnMoKXsKICAgICMgUHJlcGFyZSB0aGUgc2VydmVyIGZvciBweXRob24zCiAgICBzdWRvIHl1bSAteSBpbnN0YWxsIGdpdCBqcQogICAgc3VkbyB5dW0gLXkgaW5zdGFsbCBweXRob24zLXBpcAogICAgc3VkbyB5dW0gLXkgaW5zdGFsbCBweXRob24zIAp9CgoKZnVuY3Rpb24gaW5zdGFsbF9ub2RlanMoKXsKICAgIGN1cmwgLW8tIGh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9udm0tc2gvbnZtL3YwLjM0LjAvaW5zdGFsbC5zaCB8IGJhc2gKICAgIC4gfi8ubnZtL252bS5zaAogICAgbnZtIGluc3RhbGwgbm9kZQogICAgbm9kZSAtZSAiY29uc29sZS5sb2coJ1J1bm5pbmcgTm9kZS5qcyAnICsgcHJvY2Vzcy52ZXJzaW9uKSIKfQoKZnVuY3Rpb24gY2hlY2tfZXhlY3V0aW9uKCl7CiAgSE9TVF9GUUROPSQoaG9zdG5hbWUpCiAgSE9TVF9JUD0kKGhvc3RuYW1lIC1JKQogIGxvZ190aGlzICJCZWdpbiBNaXp0aWlrIEN1c3RvbWlzYXRpb24gb2YgSG9zdDogJHtIT1NUX0ZRRE59IC0gJHtIT1NUX0lQfSIKICBsb2dfdGhpcyAiaGVsbG8iID4vdmFyL2xvZy9taXp0aWlrLmxvZwp9CgpjaGVja19leGVjdXRpb24gICAgICAgICAgICAgICAgIHwgdGVlIC1hICIke0xPR19GSUxFfSIKaW5zdGFsbF9saWJzX29uX3VidW50dSAgICAgICAgICB8IHRlZSAtYSAiJHtMT0dfRklMRX0iCmluc3RhbGxfYXp1cmVfcHl0aG9uX3NkayAgICAgICAgfCB0ZWUgLWEgIiR7TE9HX0ZJTEV9IgpjbG9uZV9naXRfcmVwbyAgICAgICAgICAgICAgICAgIHwgdGVlIC1hICIke0xPR19GSUxFfSIKY2hlY2tfZXhlY3V0aW9uICAgICAgICAgICAgICAgICB8IHRlZSAtYSAiJHtMT0dfRklMRX0iCgoKCgo=",
             "LinuxConfiguration": {
               "disablePasswordAuthentication": true,
               "ssh": {
@@ -1390,7 +1422,7 @@
                 "3"
               ],
               "identity": {
-                "type": "SystemAssigned, UserAssigned",
+                "type": "UserAssigned",
                 "userAssignedIdentities": {
                   "[format('{0}', parameters('userManagedIdentityId'))]": {}
                 }
@@ -1479,6 +1511,73 @@
               }
             },
             {
+              "type": "Microsoft.Compute/virtualMachineScaleSets/virtualMachines",
+              "apiVersion": "2022-11-01",
+              "name": "[format('{0}/{1}', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness), '0')]",
+              "location": "[parameters('deploymentParams').location]",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "networkProfile": {
+                  "networkInterfaceConfigurations": [
+                    {
+                      "name": "[format('{0}_vmssNic', parameters('vmName'))]",
+                      "properties": {
+                        "primary": true,
+                        "enableAcceleratedNetworking": false,
+                        "enableIPForwarding": false,
+                        "ipConfigurations": [
+                          {
+                            "name": "[format('{0}_vmssIpConfig', parameters('vmName'))]",
+                            "properties": {
+                              "primary": true,
+                              "privateIPAddressVersion": "IPv4",
+                              "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('vmParams').vmSubnetName)]"
+                              },
+                              "publicIPAddressConfiguration": {
+                                "name": "[format('{0}_vmssPublicIP', parameters('vmName'))]",
+                                "properties": {
+                                  "idleTimeoutInMinutes": 15,
+                                  "ipTags": [],
+                                  "publicIPAddressVersion": "IPv4"
+                                }
+                              }
+                            }
+                          }
+                        ],
+                        "dnsSettings": {
+                          "dnsServers": []
+                        }
+                      }
+                    }
+                  ]
+                },
+                "osProfile": {
+                  "computerName": "[parameters('vmName')]",
+                  "allowExtensionOperations": true,
+                  "adminUsername": "[parameters('vmParams').adminUsername]",
+                  "adminPassword": "[parameters('vmParams').adminPassword.secureString]",
+                  "linuxConfiguration": "[if(equals(parameters('vmParams').authType, 'password'), null(), variables('LinuxConfiguration'))]"
+                },
+                "storageProfile": {
+                  "osDisk": {
+                    "osType": "Linux",
+                    "createOption": "FromImage",
+                    "caching": "ReadWrite",
+                    "diskSizeGB": 48,
+                    "managedDisk": {
+                      "storageAccountType": "StandardSSD_LRS"
+                    }
+                  },
+                  "imageReference": "[if(equals(parameters('vmParams').isUbuntu, true()), createObject('publisher', 'Canonical', 'offer', '0001-com-ubuntu-server-jammy', 'sku', '22_04-lts-gen2', 'version', 'latest'), createObject('publisher', 'RedHat', 'offer', 'RHEL', 'sku', '91-gen2', 'version', 'latest'))]"
+                },
+                "userData": "[variables('userDataScript')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachineScaleSets', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness))]"
+              ]
+            },
+            {
               "type": "Microsoft.Compute/virtualMachineScaleSets/extensions",
               "apiVersion": "2021-07-01",
               "name": "[format('{0}/{1}', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness), 'AzureMonitorLinuxAgent')]",
@@ -1498,22 +1597,127 @@
               ]
             },
             {
-              "type": "Microsoft.Compute/virtualMachineScaleSets/extensions",
+              "type": "Microsoft.Compute/virtualMachineScaleSets/virtualMachines/runCommands",
               "apiVersion": "2022-11-01",
-              "name": "[format('{0}/{1}', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness), 'installMiztiikCustomScriptForConsumer')]",
+              "name": "[format('{0}/{1}/{2}', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness), '0', 'MiztiikAutomation-RunCommand-Q-Consumers')]",
+              "location": "[parameters('deploymentParams').location]",
+              "tags": "[parameters('tags')]",
               "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "autoUpgradeMinorVersion": true,
-                "forceUpdateTag": "4",
-                "settings": {
-                  "fileUris": [
-                    "https://raw.githubusercontent.com/miztiik/azure-scale-vmss-on-events/main/app/az_consumer_for_queues.py"
-                  ],
-                  "commandToExecute": "[format('#!/bin/bash; export APP_CONFIG_NAME={0}; python3 az_consumer_for_queues.py', parameters('appConfigName'))]"
+                "asyncExecution": true,
+                "source": {
+                  "script": "[format('export APP_CONFIG_NAME={0}; python3 /var/azure-scale-vmss-on-events/app/az_consumer_for_queues.py &', parameters('appConfigName'))]"
                 },
-                "suppressFailures": false,
-                "typeHandlerVersion": "2.1"
+                "timeoutInSeconds": 3600
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachineScaleSets/virtualMachines', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness), '0')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Insights/dataCollectionRuleAssociations",
+              "apiVersion": "2021-09-01-preview",
+              "scope": "[format('Microsoft.Compute/virtualMachineScaleSets/{0}', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness))]",
+              "name": "configurationAccessEndpoint",
+              "properties": {
+                "dataCollectionEndpointId": "[parameters('linDataCollectionEndpointId')]",
+                "description": "Send Custom logs to DCR"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachineScaleSets', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Insights/dataCollectionRuleAssociations",
+              "apiVersion": "2021-09-01-preview",
+              "scope": "[format('Microsoft.Compute/virtualMachineScaleSets/{0}', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness))]",
+              "name": "[format('{0}_storeEventsDcr_{1}', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness), parameters('deploymentParams').global_uniqueness)]",
+              "properties": {
+                "dataCollectionRuleId": "[parameters('storeEventsDcrId')]",
+                "description": "Send Application Logs to DCR"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachineScaleSets', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Insights/dataCollectionRuleAssociations",
+              "apiVersion": "2021-09-01-preview",
+              "scope": "[format('Microsoft.Compute/virtualMachineScaleSets/{0}', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness))]",
+              "name": "[format('{0}_automationEvents_{1}', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness), parameters('deploymentParams').global_uniqueness)]",
+              "properties": {
+                "dataCollectionRuleId": "[parameters('automationEventsDcrId')]",
+                "description": "Send Automation Logs to DCR"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachineScaleSets', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Insights/autoscalesettings",
+              "apiVersion": "2022-10-01",
+              "name": "[format('{0}_scaleOnQLength_{1}', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness), parameters('deploymentParams').global_uniqueness)]",
+              "location": "[parameters('deploymentParams').location]",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "name": "[format('{0}_scaleOnQLength_{1}', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness), parameters('deploymentParams').global_uniqueness)]",
+                "enabled": true,
+                "predictiveAutoscalePolicy": {
+                  "scaleMode": "Disabled",
+                  "scaleLookAheadTime": null
+                },
+                "targetResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness))]",
+                "targetResourceLocation": "[parameters('deploymentParams').location]",
+                "notifications": [],
+                "profiles": [
+                  {
+                    "name": "Profile1",
+                    "capacity": {
+                      "minimum": "1",
+                      "maximum": "3",
+                      "default": "1"
+                    },
+                    "rules": [
+                      {
+                        "metricTrigger": {
+                          "metricName": "Percentage CPU",
+                          "metricNamespace": "",
+                          "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness))]",
+                          "timeGrain": "PT1M",
+                          "timeWindow": "PT5M",
+                          "timeAggregation": "Average",
+                          "operator": "GreaterThan",
+                          "threshold": 50,
+                          "statistic": "Average"
+                        },
+                        "scaleAction": {
+                          "direction": "Increase",
+                          "type": "ChangeCount",
+                          "value": "1",
+                          "cooldown": "PT5M"
+                        }
+                      },
+                      {
+                        "metricTrigger": {
+                          "metricName": "Percentage CPU",
+                          "metricNamespace": "",
+                          "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness))]",
+                          "timeGrain": "PT1M",
+                          "timeWindow": "PT5M",
+                          "timeAggregation": "Average",
+                          "operator": "LessThan",
+                          "threshold": 30,
+                          "statistic": "Average"
+                        },
+                        "scaleAction": {
+                          "direction": "Decrease",
+                          "type": "ChangeCount",
+                          "value": "1",
+                          "cooldown": "PT5M"
+                        }
+                      }
+                    ]
+                  }
+                ]
               },
               "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachineScaleSets', format('{0}_{1}_Vmss', parameters('vmName'), parameters('deploymentParams').global_uniqueness))]"
@@ -1524,7 +1728,10 @@
       },
       "dependsOn": [
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Config', parameters('storageAccountParams').storageAccountNamePrefix, parameters('deploymentParams').global_uniqueness))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Dce', parameters('dceParams').endpointNamePrefix, parameters('deploymentParams').global_uniqueness))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Dcr', parameters('logAnalyticsWorkspaceParams').workspaceName, parameters('deploymentParams').global_uniqueness))]",
         "[subscriptionResourceId('Microsoft.Resources/deployments', variables('rgName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Sq', parameters('storageAccountParams').storageAccountNamePrefix, parameters('deploymentParams').global_uniqueness))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Vm', parameters('vmParams').vmNamePrefix, parameters('deploymentParams').global_uniqueness))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('{0}_{1}_Vnet', parameters('vnetParams').vnetNamePrefix, parameters('deploymentParams').global_uniqueness))]"
       ]

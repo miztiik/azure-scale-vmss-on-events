@@ -363,6 +363,8 @@ resource r_associateDce_To_Vm 'Microsoft.Insights/dataCollectionRuleAssociations
     description: 'Send Custom logs to DCR'
   }
 }
+
+// Associate Store Events DCR to VM
 resource r_associatestoreEventsDcr_To_Vm 'Microsoft.Insights/dataCollectionRuleAssociations@2021-09-01-preview' = {
   name: '${vmName}_storeEventsDcr_${deploymentParams.global_uniqueness}'
   scope: r_vm
@@ -372,6 +374,8 @@ resource r_associatestoreEventsDcr_To_Vm 'Microsoft.Insights/dataCollectionRuleA
     description: 'Send Application Logs to DCR'
   }
 }
+
+// Associate Automation Events DCR to VM
 resource r_associateautomationEventsDcr_To_Vm 'Microsoft.Insights/dataCollectionRuleAssociations@2021-09-01-preview' = {
   name: '${vmName}_automationEvents_${deploymentParams.global_uniqueness}'
   scope: r_vm

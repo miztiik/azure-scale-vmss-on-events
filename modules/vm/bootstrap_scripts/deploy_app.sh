@@ -74,6 +74,7 @@ function install_libs_on_ubuntu(){
   sudo apt-get -y install jq
   sudo apt-get -y install git
   sudo apt-get -y install python3-pip
+  # sudo apt-get -y python3 -m pip install --upgrade pip
   
   log_this "End  jq, git, python3-pip Installation"
 }
@@ -105,15 +106,17 @@ function install_nodejs(){
 }
 
 function check_execution(){
-  log_this "Begin Miztiik Customisation"
-    log_this "hello" >/var/log/miztiik.log
+  HOST_FQDN=$(hostname)
+  HOST_IP=$(hostname -I)
+  log_this "Begin Miztiik Customisation of Host: ${HOST_FQDN} - ${HOST_IP}"
+  log_this "hello" >/var/log/miztiik.log
 }
 
 check_execution                 | tee -a "${LOG_FILE}"
 install_libs_on_ubuntu          | tee -a "${LOG_FILE}"
 install_azure_python_sdk        | tee -a "${LOG_FILE}"
 clone_git_repo                  | tee -a "${LOG_FILE}"
-log_this "bootstrap_success:yes" | tee -a "${LOG_FILE}"
+check_execution                 | tee -a "${LOG_FILE}"
 
 
 

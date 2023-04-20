@@ -41,3 +41,4 @@ resource r_q_name_Kv 'Microsoft.AppConfiguration/configurationStores/keyValues@2
 }
 
 output queueName string = r_storage_q.name
+output queueId string = r_storage_q.id
