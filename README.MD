@@ -13,6 +13,14 @@ We can configure autoscaling to Azure VMSS<sup>[1]</sup> to increase or decrease
 While building this solution, I have found anamolies that created challenges in implementing this solution. I have documented them in the [Anamolies](#-anamolies) section. 
 
 ## 📝 Anamolies
+
+  Before we go ahead and check out the anamolies, lets be clear that there few messages in the queue already. Infact, i have a producer constantnlly adding messages to the queue over a period of time. So any query to the queue length should return a non-zero value.
+
+  ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_002.png)
+      
+
+   - **Azure Monitor Portal** - My own testing shows that the metric is not updated even after every few hours
+    ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_003.png)
    - **Azure Monitor Storage Account Metrics** - The granularity of Storage Queue Metrics is at storage account level and not at individual resource level <sup>[3],[4],[5]</sup> as a metric. 
    - **Azure Monitor Metric Update Frequency** - `QueueMessageCount` is platform metric<sup>[5]</sup>. The update frequency is supposedly `1` minute<sup>[6]</sup>. 
    
@@ -30,14 +38,59 @@ While building this solution, I have found anamolies that created challenges in 
     
         >You can monitor the message count for all queues in a storage account by using the QueueMessageCount metric. This metric is **refreshed daily**.
    
-   
-      StackOverflow<sup>[8]</sup> has highlighted the issue. My own testing shows that the metric is not updated even after every few hours.
-      ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_002.png)
-      ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_003.png)
+   - **Azure SDK to Query Queue Metrics from Azure Monitor** - Querying the Queue Metrics directly using the SDK also does not reflect the facts. I used the python<sup>[8],[9]</sup> SDK and wrote a script to query the metrics. The metric is not updated even after every few hours.
 
-      Using the Ptyhon SDK, I have tested the queue lenght update frequency.
+      ```python
+      # export PYTHONWARNINGS="ignore:Unverified HTTPS request"
+      # pip install azure-mgmt-monitor==6.0.0
+      # pip install azure-monitor-query=1.1.1
+      import os
+      from datetime import timedelta, datetime
+      from azure.identity import DefaultAzureCredential
+      from azure.mgmt.monitor import MonitorManagementClient
+      from azure.monitor.query import LogsQueryClient, MetricsQueryClient, MetricsQueryClient, MetricAggregationType
 
-      ```py
+
+      subscription_id = "1axxxx9e3"
+      resource_group = "Miztiik_Enterprises_scale_vmss_on_events_011"
+      storage_account = "warehouseghv6kv011"
+      queue_service = "store-events-q-011"
+
+      metrics_uri = (
+          f"subscriptions/{subscription_id}"
+          f"/resourceGroups/{resource_group}"
+          f"/providers/Microsoft.Storage"
+          f"/storageAccounts/{storage_account}"
+          f"/queueServices/{queue_service}"
+      )
+
+      credential = DefaultAzureCredential()
+
+      query_client = MetricsQueryClient(credential)
+      start_time = datetime(2023, 4, 19)
+      duration = timedelta(days=2)
+
+
+      response = query_client.query_resource(
+          metrics_uri,
+          metric_names=["QueueMessageCount"],
+          timespan=(start_time, duration)
+          )
+      
+      print(f"QueueMessageCount: {response.metrics._metric_names['QueueMessageCount']} TimePeriod: {response.timespan} Granularity: {response.granularity} ")
+      ```
+      _Output_
+
+      ```bash
+      QueueMessageCount: 0 TimePeriod: 2023-04-19T00:00:00Z/2023-04-21T00:00:00Z Granularity: 1:00:00
+      ```
+
+      StackOverflow<sup>[11]</sup> has highlighted the issue. 
+  
+
+   - **Azure SDK to Query Queue Metrics from Azure Monitor** - Querying the Queue Message count directly using SDK seems to deliver much better results. Using the Python SDK<sup>[10]</sup>, I have tested the queue length update frequency.
+
+      ```python
       import os
       import time
       from azure.identity import DefaultAzureCredential
@@ -82,17 +135,23 @@ While building this solution, I have found anamolies that created challenges in 
       Current Message count: 3009
       ```
 
+   - **Azure Portal - Strange Place to look for consistencies** - If you navigate to the Azure Storage Queue Resource Portal Page, Surprisingly you will find the queue length being updated in the properties field.
+
+      ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_005.png)
+
+
       
-1. ## 📒 Conclusion
+## 📒 Conclusion
 
-    Here we have demonstrated how to store use Azure Storage Queue to publish and subscribe to events. You can extend the solution to setup trigger in blob conatiners to further process these events or notify other consumers.
-  
+    From this, I have come to the conclusion that the `QueueMessageCount` metric is not updated frequently by the platform. The best way to monitor the queue length is to use the SDK to query the queue directly. We can use Functions to query the queue length and scale the VMSS accordingly.
 
-1. ## 🧹 CleanUp
+  ```bash
+
+## 🧹 CleanUp
 
 If you want to destroy all the resources created by the stack, Execute the below command to delete the stack, or _you can delete the stack from console as well_
 
-- Resources created during [Deploying The Application](#-deploying-the-application)
+- Resources created during this demo
 - _Any other custom resources, you have created for this demo_
 
 ```bash
@@ -125,7 +184,10 @@ Thank you for your interest in contributing to our project. Whether it is a bug 
 1. [Azure Docs: Supported metrics with Azure Monitor - Queue Storage][5]
 1. [Azure Docs: Supported metrics with Azure Monitor - Queue Storage Data Collection][6]
 1. [Azure Docs: Best practices for monitoring Azure Queue Storage][7]
-1. [StackOverflow: How frequently are the Azure Storage Queue metrics updated][8]
+1. [Azure Docs: Azure Monitoring libraries for python][8]
+1. [Azure Docs: Azure Monitor Query client library for Python][9]
+1. [Azure Docs: Azure Monitor Query client library for Python][10]
+1. [StackOverflow: How frequently are the Azure Storage Queue metrics updated][11]
 1. [Azure Docs: Configure pythong logging in the Azure libraries][9]
 
 
@@ -142,8 +204,10 @@ Thank you for your interest in contributing to our project. Whether it is a bug 
 [5]: https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/metrics-supported#microsoftstoragestorageaccountsqueueservices
 [6]: https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/data-platform-metrics#data-collection
 [7]: https://learn.microsoft.com/en-us/azure/storage/queues/queues-storage-monitoring-scenarios
-[8]: https://stackoverflow.com/questions/67560805/how-frequently-are-the-azure-storage-queue-metrics-updated
-[9]: https://learn.microsoft.com/en-us/azure/developer/python/sdk/azure-sdk-logging
+[8]: https://learn.microsoft.com/en-us/python/api/overview/azure/monitor?view=azure-python
+[9]: https://learn.microsoft.com/en-us/python/api/overview/azure/monitor-query-readme?view=azure-python#metrics-query
+[10]: https://learn.microsoft.com/en-us/azure/storage/queues/storage-python-how-to-use-queue-storage#get-the-queue-length
+[11]: https://stackoverflow.com/questions/67560805/how-frequently-are-the-azure-storage-queue-metrics-updated
 
 [100]: https://www.udemy.com/course/aws-cloud-security/?referralCode=B7F1B6C78B45ADAF77A9
 [101]: https://www.udemy.com/course/aws-cloud-security-proactive-way/?referralCode=71DC542AD4481309A441
