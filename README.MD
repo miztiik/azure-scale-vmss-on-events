@@ -10,7 +10,7 @@ We can configure autoscaling to Azure VMSS<sup>[1]</sup> to increase or decrease
 
 ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_001.png)
 
-While building this solution, I have used other anamolies that created challenges in implementing this solution. I have documented them in the [Anamolies](#-anamolies) section. 
+While building this solution, I have found anamolies that created challenges in implementing this solution. I have documented them in the [Anamolies](#-anamolies) section. 
 
 ## 📝 Anamolies
    - **Azure Monitor Storage Account Metrics** - The granularity of Storage Queue Metrics is at storage account level and not at individual resource level <sup>[3],[4],[5]</sup> as a metric. 
