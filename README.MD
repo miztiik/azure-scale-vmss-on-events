@@ -113,25 +113,15 @@ While building this solution, I have found anamolies that created challenges in 
       ```
       _Output: As we can observe the # of messages keep increasing every `10` seconds_
       ```bash
-      Tuple timeout setting is deprecated
       Current Message count: 2973
-      Tuple timeout setting is deprecated
       Current Message count: 2977
-      Tuple timeout setting is deprecated
       Current Message count: 2981
-      Tuple timeout setting is deprecated
       Current Message count: 2985
-      Tuple timeout setting is deprecated
       Current Message count: 2989
-      Tuple timeout setting is deprecated
       Current Message count: 2993
-      Tuple timeout setting is deprecated
       Current Message count: 2997
-      Tuple timeout setting is deprecated
       Current Message count: 3001
-      Tuple timeout setting is deprecated
       Current Message count: 3005
-      Tuple timeout setting is deprecated
       Current Message count: 3009
       ```
 
@@ -139,11 +129,15 @@ While building this solution, I have found anamolies that created challenges in 
 
       ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_005.png)
 
+   - **Azure Portal - Diagnostics for Storage Queue** - If you enable diagnostic logging for your stroage account, it does show the transctions.
+
+      ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_004.png)
+
 
       
 ## 📒 Conclusion
 
-    From this, I have come to the conclusion that the `QueueMessageCount` metric is not updated frequently by the platform. The best way to monitor the queue length is to use the SDK to query the queue directly. We can use Functions to query the queue length and scale the VMSS accordingly.
+    From this, I have come to the conclusion that the `QueueMessageCount` metric is not consistenly updated  by the platform nor the frequency is reliable. As of now, The best way to monitor the queue length is to use the SDK to query the queue directly. We can use Functions to query the queue length and scale the VMSS accordingly.
 
   ```bash
 
