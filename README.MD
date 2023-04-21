@@ -2,7 +2,7 @@
 
 The developer at Mystique Unicorn are building their application using event-driven architectural pattern to process streaming data. In this application, they will have their physical stores, send a stream sales and inventory related events to a central location, where multiple downstream systems will consume these events. They are looking to scale their event consumers running in Azure VM Scale Sets when their Azure Storage queue length increases. 
 
-They heard that Azure offers capabilities to build event-driven architectures using kubernetes, Can you show them how they can get started?
+They heard that Azure offers capabilities to build event-driven architectures, Can you show them how they can get started?
 
 ## 🎯 Solutions
 
