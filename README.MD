@@ -85,7 +85,7 @@ While building this solution, I have found anamolies that created challenges in 
       QueueMessageCount: 0 TimePeriod: 2023-04-19T00:00:00Z/2023-04-21T00:00:00Z Granularity: 1:00:00
       ```
 
-   - **Azure SDK to Query Queue Metrics from Queue Properties** - Querying the Queue Message count directly using SDK seems to deliver much better results. Using the Python SDK<sup>[10]</sup>, I have tested the queue length update frequency.
+   - **Azure SDK to Query Queue Metrics from Queue Properties** - I have tested the queue length update frequency by querying the queue message count from queue properties using Python SDK<sup>[10]</sup>. This method seems to deliver much better results.
 
       ```python
       import os
@@ -108,7 +108,7 @@ While building this solution, I have found anamolies that created challenges in 
           print("Current Message count: " + str(count))
           time.sleep(10)
       ```
-      _Output: As we can observe the # of messages keep increasing every `10` seconds_
+      _Output: As we can observe the # of messages keep increasing every `10` seconds. That means the properties is clearly updated much more frequently. As a future exercise, i will try to verify it with actual count of messages in queue._
       ```bash
       Current Message count: 2973
       Current Message count: 2977
@@ -126,7 +126,7 @@ While building this solution, I have found anamolies that created challenges in 
 
       ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_005.png)
 
-   - **Azure Portal - Diagnostics for Storage Queue** - If you enable diagnostic logging for your stroage account, it does show the transctions.
+   - **Azure Portal - Diagnostics for Storage Queue** - If you enable diagnostic logging for your Stroage Account - Queue, it does show the transctions of message ingests.
 
       ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_004.png)
 
@@ -135,6 +135,8 @@ While building this solution, I have found anamolies that created challenges in 
 ## 📒 Conclusion
 
   From this, I have come to the conclusion that the `QueueMessageCount` metric is not consistenly updated  by the platform nor the frequency is reliable. StackOverflow<sup>[11]</sup> has highlighted the issue.  As of now, The best way to monitor the queue length is to use the SDK to query the queue directly. We can use Functions to query the queue length and scale the VMSS accordingly.
+
+  Better yet, If you have to make a choice between Azure Storage Queue and Azure Service Bus, have a closer look at your requirements. If you are looking for a reliable metrics for your queue at a granular level and frequently updated, then Azure Service Bus is the way to go.
 
 ## 🧹 CleanUp
 
