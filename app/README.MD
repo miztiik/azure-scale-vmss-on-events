@@ -1,22 +1,20 @@
-# Effortlessly Scale Your Azure VM Scale Sets in Response to Events
+# Auto Scaling Azure VM(ScaleSets) in response to events
 
-At Mystique Unicorn, the developers have adopted the event-driven architectural pattern for their application, which enables them to process streaming data. Specifically, their physical stores will be sending a continuous stream of sales and inventory related events to a central location. Multiple downstream systems will then consume these events. To ensure scalability, the team intends to utilize Azure VM Scale Sets to expand their event consumers whenever the Azure Storage queue length increases.
+The developer at Mystique Unicorn are building their application using event-driven architectural pattern to process streaming data. In this application, they will have their physical stores, send a stream sales and inventory related events to a central location, where multiple downstream systems will consume these events. They are looking to scale their event consumers running in Azure VM Scale Sets when their Azure Storage queue length increases. 
 
-Given their interest in leveraging Azure's event-driven capabilities, the developers are seeking guidance on how to begin implementing these features. 
+They heard that Azure offers capabilities to build event-driven architectures, Can you show them how they can get started?
 
 ## 🎯 Solutions
 
-To take advantage of Azure's event-driven capabilities and achieve autoscaling, we can configure [Azure VM Scale Sets (VMSS)][1] to dynamically increase or decrease the number of VMs based on specific events. In this case, we can scale the VMSS based on the length of the [Storage Queue Level][2]. It's worth noting that, at the moment (as of Q2-2023), Azure only supports granularity at the Storage Account level, rather than at the individual Storage Queue level. As a result, to make this approach work, we would need to limit the storage account to a single queue. Assuming that this limitation is acceptable, we can proceed with this strategy.
+We can configure autoscaling to Azure VMSS<sup>[1]</sup> to increase or decrease the VMsin response to events. In this particular case, we can to scale based on Storage Message Queue Length. As of now[Q2-2023], the granularity supported by Azure is at Storage Account level and not at individual Storage Queue Level<sup>[2]</sup>. So, this means we will have to restrict the storage account to only one queue to make this work. Lets assume this is acceptable in a parallel universe and continue.
 
 ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_vm_to_storage_queue_architecture_0001.png)
 
 While building this solution, I have found anamolies that created challenges in implementing this solution. I have documented them in the [Anamolies](#-anamolies) section. 
 
-During the process of building this solution, I have encountered anomalies that have posed challenges to the implementation. These anomalies have been documented in the [Anamolies](#-anamolies) section.
-
 ## 📝 Anamolies
 
-  Before we proceed to examine the anomalies, it's important to note that there are currently a few messages present in the queue. Additionally, a producer is continuously adding messages to the queue over a period of time. As a result, any query made to determine the queue length should return a non-zero value.
+  Before we go ahead and check out the anamolies, lets be clear that there few messages in the queue already. Infact, i have a producer constantnlly adding messages to the queue over a period of time. So any query to the queue length should return a non-zero value.
 
   ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_002.png)
       
@@ -24,19 +22,19 @@ During the process of building this solution, I have encountered anomalies that 
    - **Azure Monitor Portal** - My own testing shows that the metric is not updated even after every few hours
     ![Miztiik Automaton: Auto Scaling Azure VM(ScaleSets) in response to events](images/miztiik_automation_azure_scale_vmss_on_events_architecture_003.png)
    - **Azure Monitor Storage Account Metrics** - The granularity of Storage Queue Metrics is at storage account level and not at individual resource level <sup>[3],[4],[5]</sup> as a metric. 
-   - **Azure Monitor Metric Update Frequency** - `QueueMessageCount` is [platform metric][5]. The update frequency is supposedly `1` minute<sup>[6]</sup>. 
+   - **Azure Monitor Metric Update Frequency** - `QueueMessageCount` is platform metric<sup>[5]</sup>. The update frequency is supposedly `1` minute<sup>[6]</sup>. 
    
-        _Excerpt from the [docs][5]_
+        _Excerpt from the docs_<sup>[5]</sup>
     
         >This article is a complete list of all platform (that is, automatically collected) metrics currently available with the consolidated metric pipeline in Azure Monitor.
 
-        _Excerpt from the [docs][6]_
+        _Excerpt from the docs_<sup>[6]</sup>
     
         >Platform metrics are collected from Azure resources at **one-minute** frequency unless specified otherwise in the metric's definition.
 
-      The best practices for monitoring [Azure Queue Storage][7] informs that this is metric is refreshed daily.
+      The best practices for monitoring Azure Queue Storage<sup>[7]</sup> informs that this is metric is refreshed daily.
 
-        _Excerpt from the [docs][7]_
+        _Excerpt from the docs_<sup>[7]</sup>
     
         >You can monitor the message count for all queues in a storage account by using the QueueMessageCount metric. This metric is **refreshed daily**.
    
@@ -87,7 +85,7 @@ During the process of building this solution, I have encountered anomalies that 
       QueueMessageCount: 0 TimePeriod: 2023-04-19T00:00:00Z/2023-04-21T00:00:00Z Granularity: 1:00:00
       ```
 
-   - **Azure SDK to Query Queue Metrics from Queue Properties** - I have tested the queue length update frequency by querying the queue message count from queue properties using [Python SDK][10]. This method seems to deliver much better results.
+   - **Azure SDK to Query Queue Metrics from Queue Properties** - I have tested the queue length update frequency by querying the queue message count from queue properties using Python SDK<sup>[10]</sup>. This method seems to deliver much better results.
 
       ```python
       import os
@@ -135,9 +133,10 @@ During the process of building this solution, I have encountered anomalies that 
 
       
 ## 📒 Conclusion
-  Based on current information and research, it appears that the `QueueMessageCount` metric in Azure is not consistently updated, and its frequency cannot be relied upon. This issue has been highlighted by the community on [StackOverflow][11]. As a result, the best approach to monitor the queue length is to use the Azure SDK to directly query the queue. One potential solution could be to use Azure Functions to query the queue length and dynamically scale the VMSS accordingly.
 
-  In addition, it's worth considering the specific requirements of your application when choosing between Azure Storage Queue and Azure Service Bus. If you need reliable, granular, and frequently updated metrics for your queue, then Azure Service Bus may be the more suitable option.
+  From this, I have come to the conclusion that the `QueueMessageCount` metric is not consistenly updated  by the platform nor the frequency is reliable. StackOverflow<sup>[11]</sup> has highlighted the issue.  As of now, The best way to monitor the queue length is to use the SDK to query the queue directly. We can use Functions to query the queue length and scale the VMSS accordingly.
+
+  Better yet, If you have to make a choice between Azure Storage Queue and Azure Service Bus, have a closer look at your requirements. If you are looking for a reliable metrics for your queue at a granular level and frequently updated, then Azure Service Bus is the way to go.
 
 ## 🧹 CleanUp
 
